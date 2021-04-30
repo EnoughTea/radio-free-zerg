@@ -28,7 +28,7 @@ namespace RadioFreeZerg.CuteRadio
         public int Offset { get; init; }
 
         /// <summary> The keyword(s) to be used to filter results. </summary>
-        public string Search { get; init; }
+        public string Search { get; init; } = "";
 
         /// <summary> The property used to sort the results. The default is 'title'. </summary>
         public CuteRadioStationSort Sort { get; init; } = CuteRadioStationSort.Title;
