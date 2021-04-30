@@ -11,7 +11,7 @@ namespace RadioFreeZerg
     /// </summary>
     public static class SharedHttpClient
     {
-        public static HttpClient Instance { get; } = new HttpClient();
+        public static HttpClient Instance { get; } = new();
 
         public static void SetConnectionLeaseTimeout(Uri uri, int timeout = -1) {
             string uriBase = uri.GetLeftPart(UriPartial.Authority);
