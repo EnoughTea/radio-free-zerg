@@ -1,28 +1,7 @@
 ﻿using RestSharp;
 
-// CuteRadio provides a ton of loosely moderated radio station resources:
-// http://marxoft.co.uk/doc/cuteradio-api/
-
-namespace RadioFreeZerg
+namespace RadioFreeZerg.CuteRadio
 {
-    /// <summary> Properties of a CuteRadio station resource that can be used with sorting. </summary>
-    public enum CuteRadioStationSort
-    {
-        None,
-        Id,
-        Title,
-        Description,
-        Genre,
-        Country,
-        Language,
-        Source,
-        PlayCount,
-        LastPlayed,
-        CreatorId,
-        Approved
-    }
-    
-    
     /// <summary>
     ///     Represents CuteRadio search capabilites.
     /// </summary>
