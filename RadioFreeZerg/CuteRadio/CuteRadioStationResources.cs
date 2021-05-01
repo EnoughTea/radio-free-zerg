@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
-using Nito;
 
 namespace RadioFreeZerg.CuteRadio
 {
@@ -15,14 +14,11 @@ namespace RadioFreeZerg.CuteRadio
 
         public string? Previous { get; set; }
 
-        public static Try<CuteRadioStationResources> Deserialize(string responseContent) =>
-            Try.Create(() => {
-                var result = JsonConvert.DeserializeObject<CuteRadioStationResources>(responseContent);
-                if (result == null)
-                    throw new InvalidDataException(
-                        "CuteRadio responded with empty JSON instead of station array.");
-                return result;
-            });
+        public static CuteRadioStationResources Deserialize(string responseContent) {
+            var result = JsonConvert.DeserializeObject<CuteRadioStationResources>(responseContent);
+            return result ?? throw new InvalidDataException(
+                "CuteRadio responded with empty JSON instead of station array.");
+        }
 
         public IEnumerable<RadioStation> ToRadioStations() =>
             Items != null && Items.Length > 0
