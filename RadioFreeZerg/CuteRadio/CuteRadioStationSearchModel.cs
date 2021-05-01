@@ -52,7 +52,7 @@ namespace RadioFreeZerg.CuteRadio
             new(offset, limit, search);
 
         public RestRequest ToRequest() =>
-            (RestRequest) new RestRequest("stations", Method.GET)
+            (RestRequest) new RestRequest("/stations", Method.GET)
                           .AddQueryParameter("limit", Limit.ToString())
                           .AddQueryParameter("offset", Offset.ToString())
                           .AddQueryParameter("country", Country)
