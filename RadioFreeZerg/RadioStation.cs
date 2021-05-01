@@ -20,7 +20,7 @@ namespace RadioFreeZerg
 
         public static RadioStation FromRawSource(int id, string title, string genre, string source) {
             Uri.TryCreate(source, UriKind.Absolute, out var parsedUri);
-            return parsedUri != null
+            return parsedUri is not null
                 ? new RadioStation(id, title, genre, parsedUri)
                 : throw new InvalidDataException("Radio station stream source is not a valid URI");
         }
