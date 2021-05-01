@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace RadioFreeZerg.CuteRadio
 {
@@ -15,6 +16,12 @@ namespace RadioFreeZerg.CuteRadio
                                            int CreatorId,
                                            bool Approved)
     {
-        public RadioStation ToRadio() => new(Id, Title, Genre, Source);
+        public RadioStation? ToRadio() {
+            try {
+                return RadioStation.FromRawSource(Id, Title, Genre, Source);
+            } catch (InvalidDataException) {
+                return null;
+            }
+        }
     }
 }

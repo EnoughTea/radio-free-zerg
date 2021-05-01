@@ -3,19 +3,26 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace RadioFreeZerg
 {
+    /// <summary> Represents a proper radio station stream source. </summary>
     public record RadioStationStreamUri(Uri Uri, string[] ContentType);
 
-    public record RadioStation(int Id, string Title, string Genre, string Source)
+    /// <summary>
+    ///     Represents a single radio station with its source, which can be a link to a stream or a playlist.
+    /// </summary>
+    public record RadioStation(int Id, string Title, string Genre, Uri Source)
     {
-        public static RadioStation Default { get; } = new(0, "Default empty radio", "", "");
+        public static RadioStation Empty { get; } = new(0, "Empty station", "", new Uri("about:blank"));
 
-        public Uri? ToUri() {
-            Uri.TryCreate(Source, UriKind.Absolute, out var parsedUri);
-            return parsedUri;
+        public static RadioStation FromRawSource(int id, string title, string genre, string source) {
+            Uri.TryCreate(source, UriKind.Absolute, out var parsedUri);
+            return parsedUri != null
+                ? new RadioStation(id, title, genre, parsedUri)
+                : throw new InvalidDataException("Radio station stream source is not a valid URI");
         }
 
         /// <summary>
@@ -26,19 +33,18 @@ namespace RadioFreeZerg
         /// <exception cref="InvalidDataException"></exception>
         /// <exception cref="WebException"></exception>
         public async Task<RadioStationStreamUri> FindStreamUriAsync() {
-            var generalUri = ToUri();
-            if (generalUri == null)
-                throw new InvalidDataException("Cannot find radio station stream; source is not a valid URI");
-
-            var contentType = await FetchContentTypeAsync(generalUri).ConfigureAwait(false);
+            var contentType = await FetchContentTypeAsync(Source).ConfigureAwait(false);
             var isAudio = contentType.Any(_ => _.Contains("audio") && !_.Contains("url"));
-            if (isAudio) return new RadioStationStreamUri(generalUri, contentType);
+            if (isAudio) return new RadioStationStreamUri(Source, contentType);
 
-            var parsedUri = await FindLinkInContentAsync(generalUri).ConfigureAwait(false);
+            var parsedUri = await FindStreamLinkInContentAsync(Source).ConfigureAwait(false);
             return new RadioStationStreamUri(parsedUri, contentType);
         }
 
         private static async Task<string[]> FetchContentTypeAsync(Uri generalUri) {
+            if (generalUri.Scheme != "http" || generalUri.Scheme != "https")
+                throw new InvalidDataException($"Unsupported station source: {generalUri}");
+
             var checkHeadersResponse = await SharedHttpClient.Instance.GetAsync(generalUri,
                 HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
             var contentHeaders = checkHeadersResponse.Content.Headers;
@@ -52,21 +58,33 @@ namespace RadioFreeZerg
             return contentTypeHeaders;
         }
 
-        private static async Task<Uri> FindLinkInContentAsync(Uri generalUri) {
-            var contentResponse = await SharedHttpClient.Instance.GetAsync(generalUri).ConfigureAwait(false);
-            if (!contentResponse.IsSuccessStatusCode)
-                throw new WebException(
-                    $"'{generalUri.AbsoluteUri}' returned HTTP status: {contentResponse.StatusCode}");
+        private static async Task<Uri> FindStreamLinkInContentAsync(Uri generalUri) {
+            string content;
+            if (generalUri.Scheme == "http" && generalUri.Scheme == "https") {
+                content = await ReadWebContentAsync(generalUri).ConfigureAwait(false);
+            } else if (generalUri.Scheme == "file") {
+                content = await File.ReadAllTextAsync(generalUri.AbsolutePath, Encoding.UTF8).ConfigureAwait(false);
+            } else {
+                throw new InvalidDataException($"Unsupported station source: {generalUri}");
+            }
 
-            string content = await contentResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
-            string foundLink = FindLinkInContent(content);
+            string foundLink = FindStreamLinkInContent(content);
             if (string.IsNullOrEmpty(foundLink))
                 throw new InvalidDataException("Downloaded playlist did not contain any http links");
 
             return new Uri(foundLink, UriKind.Absolute);
         }
 
-        private static string FindLinkInContent(string content) {
+        private static async Task<string> ReadWebContentAsync(Uri generalUri) {
+            var contentResponse = await SharedHttpClient.Instance.GetAsync(generalUri).ConfigureAwait(false);
+            if (!contentResponse.IsSuccessStatusCode)
+                throw new WebException(
+                    $"{generalUri.AbsoluteUri} returned bad HTTP status: {contentResponse.StatusCode}");
+
+            return await contentResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+        }
+
+        private static string FindStreamLinkInContent(string content) {
             var lastLinkPos = content.LastIndexOf("http", StringComparison.InvariantCultureIgnoreCase);
             if (lastLinkPos < 0) return "";
 
