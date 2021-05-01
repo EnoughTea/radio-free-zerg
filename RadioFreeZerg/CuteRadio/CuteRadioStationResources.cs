@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
@@ -8,7 +8,7 @@ namespace RadioFreeZerg.CuteRadio
     /// <summary> CuteRadio response for GET /api/cuteradio/stations — retrieves a list of stations. </summary>
     public class CuteRadioStationResources
     {
-        public CuteRadioStationResource[]? Items { get; set; }
+        public ImmutableList<CuteRadioStationResource>? Items { get; set; }
 
         public string? Next { get; set; }
 
@@ -20,9 +20,14 @@ namespace RadioFreeZerg.CuteRadio
                 "CuteRadio responded with empty JSON instead of station array.");
         }
 
-        public IEnumerable<RadioStation> ToRadioStations() =>
-            Items != null && Items.Length > 0
-                ? Items.Select(_ => _.ToRadio())
-                : Enumerable.Empty<RadioStation>();
+        public ImmutableList<RadioStation> ToRadioStations() {
+            if (Items != null && Items.Count > 0)
+                return (from stationResouce in Items
+                        let radio = stationResouce.ToRadio()
+                        where radio != null
+                        select radio).ToImmutableList()!;
+
+            return ImmutableList<RadioStation>.Empty;
+        }
     }
 }
