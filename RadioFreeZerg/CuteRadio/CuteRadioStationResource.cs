@@ -16,7 +16,7 @@ namespace RadioFreeZerg.CuteRadio
                                            int CreatorId,
                                            bool Approved)
     {
-        public RadioStation? ToRadio() {
+        public RadioStation? ToRadioOrNull() {
             try {
                 return RadioStation.FromRawSource(Id, Title, Genre, Source);
             } catch (InvalidDataException) {
