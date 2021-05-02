@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Threading.Tasks;
 using NLog;
-using RadioFreeZerg.CuteRadio;
 using RadioFreeZerg.States;
 
 namespace RadioFreeZerg

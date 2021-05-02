@@ -24,14 +24,14 @@ namespace RadioFreeZerg.States
         public void GoNext() {
             if (HasNext) {
                 CurrentPage = NextPage;
-                SearchModel = SearchModel with { Offset = SearchModel.Offset + SearchModel.Limit };
+                SearchModel = SearchModel with {Offset = SearchModel.Offset + SearchModel.Limit};
             }
         }
-        
+
         public void GoPrevious() {
             if (HasPrevious) {
                 CurrentPage = PreviousPage;
-                SearchModel = SearchModel with { Offset = SearchModel.Offset - SearchModel.Limit };
+                SearchModel = SearchModel with {Offset = SearchModel.Offset - SearchModel.Limit};
             }
         }
 

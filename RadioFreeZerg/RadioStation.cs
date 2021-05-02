@@ -60,13 +60,12 @@ namespace RadioFreeZerg
 
         private static async Task<Uri> FindStreamLinkInContentAsync(Uri generalUri) {
             string content;
-            if (generalUri.Scheme == "http" && generalUri.Scheme == "https") {
+            if (generalUri.Scheme == "http" && generalUri.Scheme == "https")
                 content = await ReadWebContentAsync(generalUri).ConfigureAwait(false);
-            } else if (generalUri.Scheme == "file") {
+            else if (generalUri.Scheme == "file")
                 content = await File.ReadAllTextAsync(generalUri.AbsolutePath, Encoding.UTF8).ConfigureAwait(false);
-            } else {
+            else
                 throw new InvalidDataException($"Unsupported station source: {generalUri}");
-            }
 
             string foundLink = FindStreamLinkInContent(content);
             if (string.IsNullOrEmpty(foundLink))

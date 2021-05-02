@@ -2,7 +2,6 @@
 {
     public class QuittingState : AppState
     {
-        public QuittingState() : base(AppStateId.Quitting) {
-        }
+        public QuittingState() : base(AppStateId.Quitting) { }
     }
 }

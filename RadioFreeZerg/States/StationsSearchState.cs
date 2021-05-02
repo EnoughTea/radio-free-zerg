@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Immutable;
 using RadioFreeZerg.CuteRadio;
 
 namespace RadioFreeZerg.States
@@ -14,16 +13,14 @@ namespace RadioFreeZerg.States
         }
 
         public override AppStateId HandleEvent(string? stateEvent, AppStateData data) {
-            if (stateEvent?.Trim() == "b") {
-                return AppStateId.Initial;
-            }
+            if (stateEvent?.Trim() == "b") return AppStateId.Initial;
 
             if (data.Search.CurrentPage is null) {
                 data.Search.SearchModel = data.Search.SearchModel with {Search = stateEvent ?? ""};
                 var stationResources = PerformSearch(data);
                 data.Search.CurrentPage = stationResources;
             }
-            
+
             data.Search.Prefetch(); // Fire and forget by design
             return PrintRadiosIfAny(data.Search.CurrentPage) ? AppStateId.StationsFound : AppStateId.StationsSearch;
         }
@@ -38,22 +35,22 @@ namespace RadioFreeZerg.States
             foreach (var radio in radios) {
                 Console.WriteLine(radio);
             }
+
             return true;
         }
 
         internal static CuteRadioStationResources PerformSearch(AppStateData data) {
             CuteRadioStationResources searchResults = new();
-  
+
             try {
                 var stationsPageTask = CuteRadioStationResources.FetchAsync(data.Search.SearchModel)
                                                                 .ConfigureAwait(false);
                 searchResults = stationsPageTask.GetAwaiter().GetResult();
-                
             } catch (Exception e) {
                 Console.WriteLine($"Cannot perform radio station search: {e.Message}.");
                 Log.Error(e);
             }
-            
+
             return searchResults;
         }
     }

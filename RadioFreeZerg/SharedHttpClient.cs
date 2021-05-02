@@ -5,9 +5,9 @@ using System.Net.Http;
 namespace RadioFreeZerg
 {
     /// <summary>
-    /// Provides shared <see cref="HttpClient"/> instance.
-    /// See https://www.aspnetmonsters.com/2016/08/2016-08-27-httpclientwrong/.
-    /// There could be certain DNS issues, so use <see cref="SetConnectionLeaseTimeout"/> if needed.
+    ///     Provides shared <see cref="HttpClient" /> instance.
+    ///     See https://www.aspnetmonsters.com/2016/08/2016-08-27-httpclientwrong/.
+    ///     There could be certain DNS issues, so use <see cref="SetConnectionLeaseTimeout" /> if needed.
     /// </summary>
     public static class SharedHttpClient
     {

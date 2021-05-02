@@ -8,8 +8,8 @@ namespace RadioFreeZerg.States
     /// <summary> Finite state machine. </summary>
     public abstract class StateMachineBase<TStateId, TStateData, TStateEvent> where TStateId : struct
     {
-        private readonly ConcurrentDictionary<TStateId, State<TStateId, TStateData, TStateEvent>> idsToStates = new();
         private static readonly Logger log = LogManager.GetCurrentClassLogger();
+        private readonly ConcurrentDictionary<TStateId, State<TStateId, TStateData, TStateEvent>> idsToStates = new();
         private readonly object locker = new();
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace RadioFreeZerg.States
             log.Trace($"Transitioning from {Current?.Id.ToString() ?? "<null>"} to {stateId}.");
             ExitCurrentState();
             // If a state ID was provided, find and enter the next state with this ID.
-            if (!IsDefaultId(ref stateId)) {
+            if (!IsDefaultId(ref stateId))
                 lock (locker) {
                     if (idsToStates.TryGetValue(stateId, out var nextState)) {
                         var prevStateId = CurrentId;
@@ -70,10 +70,9 @@ namespace RadioFreeZerg.States
                         throw new InvalidOperationException($"Can't get the next state with ID: {stateId}");
                     }
                 }
-            }
         }
 
-        
+
         public void Add(IEnumerable<State<TStateId, TStateData, TStateEvent>> states) {
             foreach (var state in states) {
                 Add(state);
@@ -86,9 +85,7 @@ namespace RadioFreeZerg.States
             if (Exists(newState.Id))
                 throw new ArgumentException("State with the same ID already exists", nameof(newState));
 
-            if (idsToStates.TryAdd(newState.Id, newState)) {
-                newState.Reset(Data);
-            }
+            if (idsToStates.TryAdd(newState.Id, newState)) newState.Reset(Data);
         }
 
         /// <summary> Resets the machine and all its states. </summary>
@@ -122,7 +119,7 @@ namespace RadioFreeZerg.States
                 }
             }
         }
-        
+
         private void ExitCurrentState() {
             lock (locker) {
                 if (Current is not null) {

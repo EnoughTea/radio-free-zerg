@@ -23,13 +23,13 @@ namespace RadioFreeZerg.CuteRadio
             return result ?? throw new InvalidDataException(
                 "CuteRadio responded with empty JSON instead of station array.");
         }
-        
+
         public static async Task<CuteRadioStationResources> FetchAsync(CuteRadioStationSearchModel requestData) {
             var request = requestData.ToRequest();
             var stationsResponse = await CuteRadioClient.Instance.ExecuteAsync(request).ConfigureAwait(false);
             return FromContent(stationsResponse.Content, request.Resource);
         }
-        
+
         public ImmutableList<RadioStation> ToRadioStations() {
             if (Items is not null && Items.Count > 0)
                 return (from stationResouce in Items
