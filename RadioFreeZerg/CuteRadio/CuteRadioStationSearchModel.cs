@@ -16,33 +16,33 @@ namespace RadioFreeZerg.CuteRadio
                                               bool SortDescending = false)
     {
         /// <summary> Restricts results to those matching the specified country. </summary>
-        public string Country { get; } = Country;
+        public string Country { get; init; } = Country;
 
         /// <summary> Restricts results to those matching the specified genre. </summary>
-        public string Genre { get; } = Genre;
+        public string Genre { get; init; } = Genre;
 
         /// <summary> Restricts results to those matching the comma-separated list of station ids. </summary>
-        public string Id { get; } = Id;
+        public string Id { get; init; } = Id;
 
         /// <summary> Restricts results to those matching the specified language. </summary>
-        public string Language { get; } = Language;
+        public string Language { get; init; } = Language;
 
         /// <summary>
         ///     The maximum number of results that should be returned. Must be between 1 and 50. The default is 20.
         /// </summary>
-        public int Limit { get; } = Limit;
+        public int Limit { get; init; } = Limit;
 
         /// <summary> The index of the first result to be returned. The index is 0-based. </summary>
-        public int Offset { get; } = Offset;
+        public int Offset { get; init; } = Offset;
 
         /// <summary> The keyword(s) to be used to filter results. </summary>
-        public string Search { get; } = Search;
+        public string Search { get; init; } = Search;
 
         /// <summary> The property used to sort the results. The default is 'title'. </summary>
-        public CuteRadioStationSort Sort { get; } = Sort;
+        public CuteRadioStationSort Sort { get; init; } = Sort;
 
         /// <summary> Whether result should be sorted in descending order. The default is false. </summary>
-        public bool SortDescending { get; } = SortDescending;
+        public bool SortDescending { get; init; } = SortDescending;
 
         /// <summary>
         ///     Restricts results to those created by the authenticated user. Requires a valid access token.
