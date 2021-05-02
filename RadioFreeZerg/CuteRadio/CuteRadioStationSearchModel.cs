@@ -6,7 +6,7 @@ namespace RadioFreeZerg.CuteRadio
     ///     Represents CuteRadio search capabilites.
     /// </summary>
     public record CuteRadioStationSearchModel(int Offset = 0,
-                                              int Limit = 10,
+                                              int Limit = 20,
                                               string Search = "",
                                               string Country = "",
                                               string Genre = "",
