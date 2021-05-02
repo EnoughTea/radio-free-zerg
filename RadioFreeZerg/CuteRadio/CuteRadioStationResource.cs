@@ -12,7 +12,7 @@ namespace RadioFreeZerg.CuteRadio
                                            string Language,
                                            string Source,
                                            int PlayCount,
-                                           DateTime LastPlayed,
+                                           DateTime? LastPlayed,
                                            int CreatorId,
                                            bool Approved)
     {
