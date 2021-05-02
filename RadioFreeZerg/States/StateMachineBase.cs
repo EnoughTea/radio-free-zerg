@@ -9,7 +9,7 @@ namespace RadioFreeZerg.States
     public abstract class StateMachineBase<TStateId, TStateData, TStateEvent> where TStateId : struct
     {
         private readonly ConcurrentDictionary<TStateId, State<TStateId, TStateData, TStateEvent>> idsToStates = new();
-        private readonly Logger log = LogManager.GetCurrentClassLogger();
+        private static readonly Logger log = LogManager.GetCurrentClassLogger();
         private readonly object locker = new();
 
         /// <summary>
