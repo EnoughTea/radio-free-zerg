@@ -4,7 +4,7 @@
     {
         None,
         Initial,
-        StationSearch,
+        StationsSearch,
         StationsFound,
         StationPlaying,
         StationStopped,

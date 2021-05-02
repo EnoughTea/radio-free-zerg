@@ -14,8 +14,8 @@ namespace RadioFreeZerg.States
         }
 
         public override AppStateId HandleEvent(string? stateEvent, AppStateData data) {
-            return stateEvent switch {
-                "s" => AppStateId.StationSearch,
+            return stateEvent?.Trim() switch {
+                "s" => AppStateId.StationsSearch,
                 _ => AppStateId.Initial
             };
         }

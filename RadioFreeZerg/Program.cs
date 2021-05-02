@@ -14,7 +14,8 @@ namespace RadioFreeZerg
             var appStateMachine = new AppStateMachine(new AppStateData());
             appStateMachine.Add(new InitialState());
             appStateMachine.Add(new QuittingState());
-            appStateMachine.Add(new StationSearchState());
+            appStateMachine.Add(new StationsSearchState());
+            appStateMachine.Add(new StationsFoundState());
             appStateMachine.Transition(AppStateId.Initial);
 
             Console.CancelKeyPress += (_, _) => appStateMachine.Transition(AppStateId.Quitting);
