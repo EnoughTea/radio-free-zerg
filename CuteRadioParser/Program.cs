@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using NLog;
 using RadioFreeZerg.CuteRadio;
 
@@ -16,6 +16,7 @@ namespace RadioFreeZerg
 
         private static async Task Main(string[] args) {
             var serializer = new JsonSerializer {
+                ContractResolver = new CamelCasePropertyNamesContractResolver(),
                 Culture = CultureInfo.InvariantCulture,
                 DateTimeZoneHandling = DateTimeZoneHandling.Utc,
                 Formatting = Formatting.Indented
@@ -50,7 +51,7 @@ namespace RadioFreeZerg
                 serializer.Serialize(file, radioStations);
                 Log.Trace("Stations serialized.");
             }
-            
+
             Log.Info($"CuteRadio parser finished with {searchModel.Offset + searchModel.Limit} entries processed, " +
                 $"among them {radioStations.Count} were valid.");
         }
