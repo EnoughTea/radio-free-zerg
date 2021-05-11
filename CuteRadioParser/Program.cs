@@ -23,7 +23,7 @@ namespace RadioFreeZerg
 
             List<RadioStation> radioStations = new();
             var searchModel = CuteRadioStationSearchModel.FromSearch("", 0, 20);
-            var quit = false;
+            bool quit = false;
             SharedHttpClient.Instance.Timeout = TimeSpan.FromSeconds(5);
             Log.Info("CuteRadio parser started.");
             while (!quit) {
