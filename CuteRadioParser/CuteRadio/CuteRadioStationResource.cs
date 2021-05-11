@@ -18,7 +18,8 @@ namespace RadioFreeZerg.CuteRadio
     {
         public RadioStation? ToRadioOrNull() {
             try {
-                return RadioStation.FromRawSource(Id, Title, Genre, Source);
+                return RadioStation.FromRawSource(Id, Title, Description, Genre, Country, Language, Source,
+                    Array.Empty<string>());
             } catch (InvalidDataException) {
                 return null;
             }

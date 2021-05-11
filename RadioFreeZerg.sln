@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RadioFreeZerg", "RadioFreeZerg\RadioFreeZerg.csproj", "{FDCB042F-3515-49FD-B6F3-68BE7656EFB1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CuteRadioParser", "CuteRadioParser\CuteRadioParser.csproj", "{FDCB042F-3515-49FD-B6F3-68BE7656EFB1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
