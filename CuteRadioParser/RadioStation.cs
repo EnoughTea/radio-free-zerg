@@ -51,8 +51,8 @@ namespace RadioFreeZerg
             var contentType = await FetchContentTypeAsync(source).ConfigureAwait(false);
             if (IsAudioContent(contentType)) return new RadioStationStreamUri(source, contentType);
 
-            var parsedUri = await FindStreamLinkInContentAsync(source).ConfigureAwait(false);
-            return new RadioStationStreamUri(parsedUri, contentType);
+            var (parsedUri, parsedContentType) = await FindStreamLinkInContentAsync(source).ConfigureAwait(false);
+            return new RadioStationStreamUri(parsedUri, parsedContentType);
         }
 
         private static bool IsAudioContent(string[] contentType) =>
@@ -80,7 +80,7 @@ namespace RadioFreeZerg
             return contentTypeHeaders;
         }
 
-        private static async Task<Uri> FindStreamLinkInContentAsync(Uri generalUri) {
+        private static async Task<RadioStationStreamUri> FindStreamLinkInContentAsync(Uri generalUri) {
             string content;
             if (generalUri.Scheme == "http" || generalUri.Scheme == "https")
                 content = await ReadWebContentAsync(generalUri).ConfigureAwait(false);
@@ -99,7 +99,7 @@ namespace RadioFreeZerg
                 throw new InvalidDataException(
                     $"Found URI {foundUri.AbsoluteUri} did not point to audio: {string.Join("|", foundContentType)}");
 
-            return foundUri;
+            return new RadioStationStreamUri(foundUri, foundContentType);
         }
 
         private static async Task<string> ReadWebContentAsync(Uri generalUri) {
