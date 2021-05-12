@@ -56,7 +56,7 @@ namespace RadioFreeZerg
         }
 
         private static bool IsAudioContent(string[] contentType) =>
-            contentType.Any(_ => _.Contains("audio") && !_.Contains("url"));
+            contentType.Any(_ => _.Contains("audio") && !_.Contains("url") && !_.Contains("charset="));
 
         private static async Task<string[]> FetchContentTypeAsync(Uri generalUri) {
             if (generalUri.Scheme != "http" && generalUri.Scheme != "https")
@@ -97,7 +97,7 @@ namespace RadioFreeZerg
             var foundContentType = await FetchContentTypeAsync(foundUri).ConfigureAwait(false);
             if (!IsAudioContent(foundContentType))
                 throw new InvalidDataException(
-                    $"Found URI ${foundUri.AbsoluteUri} did not point to audio: {string.Join("|", foundContentType)}");
+                    $"Found URI {foundUri.AbsoluteUri} did not point to audio: {string.Join("|", foundContentType)}");
 
             return foundUri;
         }

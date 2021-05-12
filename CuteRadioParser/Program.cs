@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -21,9 +22,9 @@ namespace RadioFreeZerg
                 DateTimeZoneHandling = DateTimeZoneHandling.Utc,
                 Formatting = Formatting.Indented
             };
-
-            List<RadioStation> radioStations = new();
-            var searchModel = CuteRadioStationSearchModel.FromSearch("", 0, 20);
+            
+            Dictionary<Uri, RadioStation> radioStations = new();
+            var searchModel = CuteRadioStationSearchModel.FromSearch("", 0, 50);
             bool quit = false;
             SharedHttpClient.Instance.Timeout = TimeSpan.FromSeconds(5);
             Log.Info("CuteRadio parser started.");
@@ -46,18 +47,22 @@ namespace RadioFreeZerg
                     }
                 }
 
-                Log.Trace("Serializing stations...");
-                await using var file = File.CreateText(@"stations.json");
-                serializer.Serialize(file, radioStations);
-                Log.Trace("Stations serialized.");
+                Serialize(serializer, radioStations);
             }
-
+            
             Log.Info($"CuteRadio parser finished with {searchModel.Offset + searchModel.Limit} entries processed, " +
                 $"among them {radioStations.Count} were valid.");
         }
 
+        private static void Serialize(JsonSerializer serializer, Dictionary<Uri, RadioStation> radioStations) {
+            Log.Trace("Serializing stations...");
+            using var file = File.CreateText(@"stations.json");
+            serializer.Serialize(file, radioStations.Values.OrderBy(_ => _.Id));
+            Log.Trace("Stations serialized.");
+        }
+
         private static async Task<bool> ProcessStationsPage(CuteRadioStationSearchModel searchModel,
-                                                            List<RadioStation> radioStations) {
+                                                            IDictionary<Uri, RadioStation> radioStations) {
             Log.Info($"Fetching {searchModel.Offset}-{searchModel.Offset + searchModel.Limit} stations...");
             var stationsPage = await CuteRadioStationResources.FetchAsync(searchModel)
                                                               .ConfigureAwait(false);
@@ -73,7 +78,7 @@ namespace RadioFreeZerg
                     var validRadio = potentialRadio with {
                         Source = radioStream.Uri, ContentType = radioStream.ContentType
                     };
-                    radioStations.Add(validRadio);
+                    radioStations.TryAdd(validRadio.Source, validRadio);
                 } catch (Exception e) {
                     Log.Debug($"{potentialRadio.Title} ({potentialRadio.Source.AbsoluteUri}) had an invalid source: " +
                         e.Message);
