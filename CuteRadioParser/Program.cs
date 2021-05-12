@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -23,7 +24,7 @@ namespace RadioFreeZerg
                 Formatting = Formatting.Indented
             };
             
-            Dictionary<Uri, RadioStation> radioStations = new();
+            ConcurrentDictionary<Uri, RadioStation> radioStations = new();
             var searchModel = CuteRadioStationSearchModel.FromSearch("", 0, 50);
             bool quit = false;
             SharedHttpClient.Instance.Timeout = TimeSpan.FromSeconds(5);
@@ -54,7 +55,7 @@ namespace RadioFreeZerg
                 $"among them {radioStations.Count} were valid.");
         }
 
-        private static void Serialize(JsonSerializer serializer, Dictionary<Uri, RadioStation> radioStations) {
+        private static void Serialize(JsonSerializer serializer, IDictionary<Uri, RadioStation> radioStations) {
             Log.Trace("Serializing stations...");
             using var file = File.CreateText(@"stations.json");
             serializer.Serialize(file, radioStations.Values.OrderBy(_ => _.Id));
@@ -62,7 +63,7 @@ namespace RadioFreeZerg
         }
 
         private static async Task<bool> ProcessStationsPage(CuteRadioStationSearchModel searchModel,
-                                                            IDictionary<Uri, RadioStation> radioStations) {
+                                                            ConcurrentDictionary<Uri, RadioStation> radioStations) {
             Log.Info($"Fetching {searchModel.Offset}-{searchModel.Offset + searchModel.Limit} stations...");
             var stationsPage = await CuteRadioStationResources.FetchAsync(searchModel)
                                                               .ConfigureAwait(false);
@@ -70,22 +71,30 @@ namespace RadioFreeZerg
 
             Log.Trace("Checking fetched stations' sources...");
             var potentialRadios = stationsPage.ToRadioStations();
-            foreach (var potentialRadio in potentialRadios) {
-                try {
-                    Log.Trace($"Checking {potentialRadio.Title} ({potentialRadio.Source})...");
-                    var radioStream = await RadioStation.FindStreamUriAsync(potentialRadio.Source)
-                                                        .ConfigureAwait(false);
-                    var validRadio = potentialRadio with {
-                        Source = radioStream.Uri, ContentType = radioStream.ContentType
-                    };
-                    radioStations.TryAdd(validRadio.Source, validRadio);
-                } catch (Exception e) {
-                    Log.Debug($"{potentialRadio.Title} ({potentialRadio.Source.AbsoluteUri}) had an invalid source: " +
-                        e.Message);
+            var radioCheckTasks = potentialRadios.Select(potentialRadio => Task.Run(async () => {
+                    var validRadioOrNull = await CheckRadioStationSource(potentialRadio).ConfigureAwait(false);
+                    if (validRadioOrNull != null) radioStations.TryAdd(validRadioOrNull.Source, validRadioOrNull);
                 }
-            }
-
+            ));
+            await Task.WhenAll(radioCheckTasks).ConfigureAwait(false); 
             return true;
         }
+
+        private static async Task<RadioStation?> CheckRadioStationSource(RadioStation potentialRadio) {
+            try {
+                Log.Trace($"Checking {potentialRadio.Title} ({potentialRadio.Source})...");
+                var (uri, contentType) = await RadioStation.FindStreamUriAsync(potentialRadio.Source)
+                    .ConfigureAwait(false);
+                return potentialRadio with {
+                    Source = uri,
+                    ContentType = contentType
+                };
+            } catch (Exception e) {
+                Log.Debug($"{potentialRadio.Title} ({potentialRadio.Source.AbsoluteUri}) had an invalid source: " +
+                    e.Message);
+                return null;
+            }
+        } 
+        
     }
 }
