@@ -56,7 +56,13 @@ namespace RadioFreeZerg
         }
 
         private static bool IsAudioContent(string[] contentType) =>
-            contentType.Any(_ => _.Contains("audio") && !_.Contains("url") && !_.Contains("charset="));
+            contentType.Any(_ => 
+                _.Contains("audio") &&
+                !_.Contains("url") &&
+                !_.Contains("charset") &&
+                !_.Contains("pls") &&
+                !_.Contains("xml") &&
+                !_.Contains("wax") );
 
         private static async Task<string[]> FetchContentTypeAsync(Uri generalUri) {
             if (generalUri.Scheme != "http" && generalUri.Scheme != "https")
