@@ -6,7 +6,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RadioFreeZerg
+namespace CuteRadioParser
 {
     /// <summary> Represents a proper radio station stream source. </summary>
     public record RadioStationStreamUri(Uri Uri, string[] ContentType);

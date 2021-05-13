@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace RadioFreeZerg.CuteRadio
+namespace CuteRadioParser.CuteRadio
 {
     /// <summary> A CuteRadio station resource identifies an internet radio station. </summary>
     public record CuteRadioStationResource(int Id,

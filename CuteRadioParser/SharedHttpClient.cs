@@ -2,7 +2,7 @@
 using System.Net;
 using System.Net.Http;
 
-namespace RadioFreeZerg
+namespace CuteRadioParser
 {
     /// <summary>
     ///     Provides shared <see cref="HttpClient" /> instance.

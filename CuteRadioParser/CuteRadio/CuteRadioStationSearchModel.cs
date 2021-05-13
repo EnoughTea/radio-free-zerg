@@ -1,6 +1,6 @@
 ﻿using RestSharp;
 
-namespace RadioFreeZerg.CuteRadio
+namespace CuteRadioParser.CuteRadio
 {
     /// <summary>
     ///     Represents CuteRadio search capabilites.

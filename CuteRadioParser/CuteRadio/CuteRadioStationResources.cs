@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using RestSharp;
 
-namespace RadioFreeZerg.CuteRadio
+namespace CuteRadioParser.CuteRadio
 {
     /// <summary> CuteRadio response for GET /api/cuteradio/stations — retrieves a list of stations. </summary>
     public class CuteRadioStationResources
