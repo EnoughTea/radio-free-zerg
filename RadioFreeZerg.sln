@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CuteRadioParser", "CuteRadi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RadioFreeZerg", "RadioFreeZerg\RadioFreeZerg.csproj", "{20E95839-14AF-42E5-A74F-54093D6E34EB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RadioFreeZerg.Windows", "RadioFreeZerg.Windows\RadioFreeZerg.Windows.csproj", "{38EAFF41-3ED9-4E13-8B66-5427F3CFB532}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{20E95839-14AF-42E5-A74F-54093D6E34EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{20E95839-14AF-42E5-A74F-54093D6E34EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{20E95839-14AF-42E5-A74F-54093D6E34EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38EAFF41-3ED9-4E13-8B66-5427F3CFB532}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38EAFF41-3ED9-4E13-8B66-5427F3CFB532}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38EAFF41-3ED9-4E13-8B66-5427F3CFB532}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38EAFF41-3ED9-4E13-8B66-5427F3CFB532}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

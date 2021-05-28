@@ -20,6 +20,6 @@ namespace RadioFreeZerg
 
         public override int GetHashCode() => Id;
 
-        public override string ToString() => $"[{Id}] {Title} ({Genre})";
+        public override string ToString() => $"{Title} [{Genre}]";
     }
 }
