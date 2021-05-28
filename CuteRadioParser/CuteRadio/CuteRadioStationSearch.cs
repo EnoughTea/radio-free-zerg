@@ -5,7 +5,7 @@ namespace CuteRadioParser.CuteRadio
     /// <summary>
     ///     Represents CuteRadio search capabilites.
     /// </summary>
-    public record CuteRadioStationSearchModel(int Offset = 0,
+    public record CuteRadioStationSearch(int Offset = 0,
                                               int Limit = 20,
                                               string Search = "",
                                               string Country = "",
@@ -48,7 +48,7 @@ namespace CuteRadioParser.CuteRadio
         ///     Restricts results to those created by the authenticated user. Requires a valid access token.
         /// </summary>
         //public bool Mine { get; init; }
-        public static CuteRadioStationSearchModel FromSearch(string search, int offset = 0, int limit = 10) =>
+        public static CuteRadioStationSearch FromSearch(string search, int offset = 0, int limit = 10) =>
             new(offset, limit, search);
 
         public RestRequest ToRequest() =>

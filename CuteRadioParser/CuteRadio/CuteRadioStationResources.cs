@@ -24,7 +24,7 @@ namespace CuteRadioParser.CuteRadio
                 "CuteRadio responded with empty JSON instead of station array.");
         }
 
-        public static async Task<CuteRadioStationResources> FetchAsync(CuteRadioStationSearchModel requestData) {
+        public static async Task<CuteRadioStationResources> FetchAsync(CuteRadioStationSearch requestData) {
             var request = requestData.ToRequest();
             var stationsResponse = await CuteRadioClient.Instance.ExecuteAsync(request).ConfigureAwait(false);
             return FromContent(stationsResponse.Content, request.Resource);

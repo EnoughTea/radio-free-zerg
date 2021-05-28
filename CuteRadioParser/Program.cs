@@ -28,13 +28,13 @@ namespace CuteRadioParser
             Log.Info("CuteRadio parser started.");
             SharedHttpClient.Instance.Timeout = TimeSpan.FromSeconds(5);
             ConcurrentDictionary<Uri, RadioStation> sourcesToStations = new();
-            var searchModel = CuteRadioStationSearchModel.FromSearch("", 0, 50);
+            var stationSearch = CuteRadioStationSearch.FromSearch("", 0, 50);
             var shouldContinue = false;
 
             do {
                 try {
-                    (shouldContinue, searchModel) = await
-                        GatherStationsFromCuteRadioAsync(searchModel, sourcesToStations).ConfigureAwait(false);
+                    (shouldContinue, stationSearch) = await
+                        GatherStationsFromCuteRadioAsync(stationSearch, sourcesToStations).ConfigureAwait(false);
                 } catch (Exception e) {
                     Log.Error(e, "Unexpected error when processing stations page");
                     Thread.Sleep(5000);
@@ -43,16 +43,16 @@ namespace CuteRadioParser
 
             var stations = sourcesToStations.Values.OrderBy(_ => _.Id);
             Serialize(Serializer, stations);
-            Log.Info($"CuteRadio parser finished with {searchModel.Offset + searchModel.Limit} entries processed, " +
+            Log.Info($"CuteRadio parser finished with {stationSearch.Offset + stationSearch.Limit} entries processed, " +
                 $"among them {sourcesToStations.Count} were valid.");
         }
 
-        private static async Task<(bool, CuteRadioStationSearchModel)> GatherStationsFromCuteRadioAsync(
-            CuteRadioStationSearchModel searchModel,
+        private static async Task<(bool, CuteRadioStationSearch)> GatherStationsFromCuteRadioAsync(
+            CuteRadioStationSearch search,
             ConcurrentDictionary<Uri, RadioStation> radioStations) {
-            var shouldContinue = await ProcessStationsPageAsync(searchModel, radioStations).ConfigureAwait(false);
-            searchModel = searchModel with {Offset = searchModel.Offset + searchModel.Limit};
-            return (shouldContinue, searchModel);
+            var shouldContinue = await ProcessStationsPageAsync(search, radioStations).ConfigureAwait(false);
+            search = search with {Offset = search.Offset + search.Limit};
+            return (shouldContinue, search);
         }
 
         private static void Serialize(JsonSerializer serializer, IEnumerable<RadioStation> radioStations) {
@@ -62,11 +62,11 @@ namespace CuteRadioParser
             Log.Trace("Stations serialized.");
         }
 
-        private static async Task<bool> ProcessStationsPageAsync(CuteRadioStationSearchModel searchModel,
+        private static async Task<bool> ProcessStationsPageAsync(CuteRadioStationSearch search,
                                                                  ConcurrentDictionary<Uri, RadioStation>
                                                                      radioStations) {
-            Log.Info($"Fetching {searchModel.Offset}-{searchModel.Offset + searchModel.Limit} stations...");
-            var stationsPage = await CuteRadioStationResources.FetchAsync(searchModel)
+            Log.Info($"Fetching {search.Offset}-{search.Offset + search.Limit} stations...");
+            var stationsPage = await CuteRadioStationResources.FetchAsync(search)
                                                               .ConfigureAwait(false);
             if (string.IsNullOrEmpty(stationsPage.Next)) return false;
 

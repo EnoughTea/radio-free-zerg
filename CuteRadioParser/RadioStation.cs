@@ -23,9 +23,6 @@ namespace CuteRadioParser
                                Uri Source,
                                string[] ContentType)
     {
-        public static RadioStation Empty { get; } =
-            new(0, "Empty station", "", "", "", "", new Uri("about:blank"), Array.Empty<string>());
-
         public static RadioStation FromRawSource(int id,
                                                  string title,
                                                  string description,
