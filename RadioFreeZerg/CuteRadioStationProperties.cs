@@ -9,5 +9,8 @@ namespace RadioFreeZerg
                                              string Country,
                                              string Language,
                                              Uri Source,
-                                             string[] ContentType);
+                                             string[] ContentType)
+    {
+        public RadioStation ToRadioStation() => new(Id, Title, Description, Genre, Country, Language, Source);
+    }
 }
