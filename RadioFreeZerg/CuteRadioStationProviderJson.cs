@@ -25,7 +25,8 @@ namespace RadioFreeZerg
 
             using var fileReader = new StreamReader(stationsFile);
             using var jsonTextReader = new JsonTextReader(fileReader);
-            stations = Serializer.Deserialize<List<CuteRadioStationProperties>>(jsonTextReader);
+            stations = Serializer.Deserialize<List<CuteRadioStationProperties>>(jsonTextReader) ??
+                throw new InvalidDataException($"Cannot deserialize {stationsFile}");
         }
 
         public IEnumerator<CuteRadioStationProperties> GetEnumerator() =>
