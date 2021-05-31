@@ -19,24 +19,32 @@ namespace RadioFreeZerg.Windows
 
             Application.Init();
             var top = Application.Top;
-            var win = new Window("RadioFreeZerg") {
+            var mainWindow = new Window("RadioFreeZerg") {
                 X = 0,
                 Y = 0,
                 Width = Dim.Fill(),
                 Height = Dim.Fill()
             };
-            top.Add(win);
+            top.Add(mainWindow);
 
+            var stationsListView = CreateStationsListView(mainWindow, radioStations);
+            CreateStatusBar(top, stationsListView, radioStations);
+            Application.Run();
+        }
+
+        private static void CreateStatusBar(View top, ListView stationsListView, RadioStationManager radioStations) {
             var statusBar = new StatusBar(new StatusItem[] {
-                new(Key.CtrlMask | Key.F, "~^F~ Find stations", () => {
-                    
-                })
+                new(Key.CtrlMask | Key.F, "~^F~ Find stations",
+                    () => {
+                        var (input, canceled) = InputPrompt.Display("This is a test prompt", "Push", "Something");
+                    })
             });
             top.Add(statusBar);
+        }
 
-            var stationsTitle = new Label(1, 0, "Stations: ");
-            win.Add(stationsTitle);
-            
+        private static ListView CreateStationsListView(View window, RadioStationManager radioStations) {
+            var stationsTitle = new Label(1, 0, "Stations:");
+            window.Add(stationsTitle);
 
             var stationsListView = new ListView {
                 X = 1,
@@ -52,8 +60,13 @@ namespace RadioFreeZerg.Windows
                 if (radioStations.CurrentStation == station) radioStations.Stop();
                 else radioStations.Play(station);
             };
-            win.Add(stationsListView);
+            window.Add(stationsListView);
+            stationsListView.Source = new RadioStationListSource(radioStations.Take(20));
+            SetupScrollBars(stationsListView);
+            return stationsListView;
+        }
 
+        private static void SetupScrollBars(ListView stationsListView) {
             var stationsScrollBar = new ScrollBarView(stationsListView, true);
 
             stationsScrollBar.ChangedPosition += () => {
@@ -70,17 +83,13 @@ namespace RadioFreeZerg.Windows
                 stationsListView.SetNeedsDisplay();
             };
 
-            stationsListView.DrawContent += e => {
+            stationsListView.DrawContent += _ => {
                 stationsScrollBar.Size = stationsListView.Source.Count - 1;
                 stationsScrollBar.Position = stationsListView.TopItem;
                 stationsScrollBar.OtherScrollBarView.Size = stationsListView.Maxlength - 1;
                 stationsScrollBar.OtherScrollBarView.Position = stationsListView.LeftItem;
                 stationsScrollBar.Refresh();
             };
-
-            stationsListView.Source = new RadioStationListSource(radioStations.Take(20));
-
-            Application.Run();
         }
     }
 }
