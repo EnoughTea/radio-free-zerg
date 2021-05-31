@@ -85,16 +85,8 @@ namespace RadioFreeZerg.Windows
         private static void ChangeAvailableStations(StatusBar statusBar,
                                                     ListView stationsListView,
                                                     RadioStationsPagination pagination) {
-            if (pagination.HasPrevious())
-                PrevItem(statusBar).Title = "~^A~ Previous";
-            else
-                PrevItem(statusBar).Title = "No previous items";
-
-            if (pagination.HasNext())
-                NextItem(statusBar).Title = "~^S~ Next";
-            else
-                NextItem(statusBar).Title = "No next";
-
+            PrevItem(statusBar).Title = pagination.HasPrevious() ? "~^A~ Previous" : "No previous items";
+            NextItem(statusBar).Title = pagination.HasNext() ? "~^S~ Next" : "No next";
             statusBar.SetNeedsDisplay();
             stationsListView.Source = new RadioStationListSource(pagination.CurrentPageStations);
         }
