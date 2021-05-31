@@ -7,19 +7,8 @@ using Terminal.Gui;
 
 namespace RadioFreeZerg.Windows
 {
-    public class Reference<T>
-    {
-        public T? Value { get; set; }
-    }
-    
     internal class Program
     {
-        private static bool Quit() {
-            var result = MessageBox.Query(50, 7, "Quit this application",
-                "Are you sure you want to quit?", "Yes", "No");
-            return result == 0;
-        }
-
         private static void Main(string[] args) {
             Core.Initialize();
             var radioStationsProvider = new CuteRadioStationProviderJson("stations.json");
@@ -46,7 +35,6 @@ namespace RadioFreeZerg.Windows
 
         private static StatusItem PrevItem(StatusBar statusBar) => statusBar.Items[0];
         private static StatusItem NextItem(StatusBar statusBar) => statusBar.Items[1];
-        private static StatusItem FindItem(StatusBar statusBar) => statusBar.Items[2];
         private static StatusItem PlayingItem(StatusBar statusBar) => statusBar.Items[3];
 
         private static StatusBar CreateStatusBar(View top,
@@ -73,7 +61,7 @@ namespace RadioFreeZerg.Windows
                         FindStations(statusBar, stationsListView.Value, radioStations, pagination);
                     }),
                 new(Key.CharMask, "Current station: <none>", null),
-                new(Key.CtrlMask | Key.Q, "~^Q~ Quit", Application.RequestStop),
+                new(Key.CtrlMask | Key.Q, "~^Q~ Quit", Application.RequestStop)
             };
             top.Add(statusBar);
             return statusBar;
@@ -97,18 +85,16 @@ namespace RadioFreeZerg.Windows
         private static void ChangeAvailableStations(StatusBar statusBar,
                                                     ListView stationsListView,
                                                     RadioStationsPagination pagination) {
-            if (pagination.HasPrevious()) {
+            if (pagination.HasPrevious())
                 PrevItem(statusBar).Title = "~^A~ Previous";
-            } else {
+            else
                 PrevItem(statusBar).Title = "No previous items";
-            }
-            
-            if (pagination.HasNext()) {
+
+            if (pagination.HasNext())
                 NextItem(statusBar).Title = "~^S~ Next";
-            } else {
+            else
                 NextItem(statusBar).Title = "No next";
-            }
-            
+
             statusBar.SetNeedsDisplay();
             stationsListView.Source = new RadioStationListSource(pagination.CurrentPageStations);
         }
@@ -141,34 +127,13 @@ namespace RadioFreeZerg.Windows
             };
             window.Add(stationsListView);
             ChangeAvailableStations(statusBar, stationsListView, pagination);
-            SetupScrollBars(stationsListView);
+            GuiHelper.SetupScrollBars(stationsListView);
             return stationsListView;
         }
 
-        private static void SetupScrollBars(ListView stationsListView) {
-            var stationsScrollBar = new ScrollBarView(stationsListView, true);
-
-            stationsScrollBar.ChangedPosition += () => {
-                stationsListView.TopItem = stationsScrollBar.Position;
-                if (stationsListView.TopItem != stationsScrollBar.Position)
-                    stationsScrollBar.Position = stationsListView.TopItem;
-                stationsListView.SetNeedsDisplay();
-            };
-
-            stationsScrollBar.OtherScrollBarView.ChangedPosition += () => {
-                stationsListView.LeftItem = stationsScrollBar.OtherScrollBarView.Position;
-                if (stationsListView.LeftItem != stationsScrollBar.OtherScrollBarView.Position)
-                    stationsScrollBar.OtherScrollBarView.Position = stationsListView.LeftItem;
-                stationsListView.SetNeedsDisplay();
-            };
-
-            stationsListView.DrawContent += _ => {
-                stationsScrollBar.Size = stationsListView.Source.Count - 1;
-                stationsScrollBar.Position = stationsListView.TopItem;
-                stationsScrollBar.OtherScrollBarView.Size = stationsListView.Maxlength - 1;
-                stationsScrollBar.OtherScrollBarView.Position = stationsListView.LeftItem;
-                stationsScrollBar.Refresh();
-            };
+        public class Reference<T>
+        {
+            public T? Value { get; set; }
         }
     }
 }
