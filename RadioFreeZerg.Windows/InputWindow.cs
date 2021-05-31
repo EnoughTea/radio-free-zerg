@@ -47,7 +47,10 @@ namespace RadioFreeZerg.Windows
                 Y = 1 + messageHeight,
                 Width = Dim.Fill() - 1
             };
-            inputTextField.TextChanged += _ => { okButton.CanFocus = !inputTextField.Text.IsEmpty; };
+            inputTextField.TextChanged += _ => {
+                if (okButton != null)
+                    okButton.CanFocus = !inputTextField.Text.IsEmpty;
+            };
             Add(inputLabel, inputTextField);
 
             cancelButton = new Button("Cancel");
@@ -107,7 +110,7 @@ namespace RadioFreeZerg.Windows
                                              string message = "") {
             var prompt = new InputPrompt(title, promptButtonText, inputLabelText, message);
             Application.Run(prompt);
-            return (prompt.Input.ToString(), prompt.Canceled);
+            return (prompt.Input.IsEmpty ? "" : prompt.Input.ToString() ?? "", prompt.Canceled);
         }
     }
 }
