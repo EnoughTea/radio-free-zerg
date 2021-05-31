@@ -14,25 +14,23 @@ namespace RadioFreeZerg.Windows
     /// <remarks>Implements support for rendering marked items.</remarks>
     public class RadioStationListSource : IListDataSource
     {
-        private readonly BitArray marks;
+        private BitArray marks;
+        private IList<RadioStation> stations;
 
         public RadioStationListSource(IEnumerable<RadioStation> source) {
-            Stations = source.ToList();
-            marks = new BitArray(Stations.Count);
-            Length = GetMaxLengthItem();
+            Init(source.ToList());
+        }
+
+        public IList<RadioStation> Stations {
+            get => stations;
+            set => Init(value);
         }
 
         /// <inheritdoc />
         public int Count => Stations.Count;
 
         /// <inheritdoc />
-        public int Length { get; }
-
-        public IList<RadioStation> Stations { get; }
-        
-        public int LastMarked { get; private set; }
-        
-        public int LastUnmarked { get; private set; }
+        public int Length { get; private set; }
 
         /// <inheritdoc />
         public void Render(ListView container,
@@ -57,20 +55,18 @@ namespace RadioFreeZerg.Windows
         /// <inheritdoc />
         public void SetMark(int item, bool value) {
             if (item < 0 || item >= Stations.Count) return;
-            
-            if (value) {
-                LastMarked = item;
-                LastUnmarked = -1;
-            } else {
-                LastUnmarked = item;
-                LastMarked = -1;
-            }
-            
+
             marks[item] = value;
         }
 
         /// <inheritdoc />
         public IList ToList() => (IList) Stations;
+
+        private void Init(IList<RadioStation> source) {
+            stations = source;
+            marks = new BitArray(Stations.Count);
+            Length = GetMaxLengthItem();
+        }
 
         private int GetMaxLengthItem() =>
             Stations.Select(station => station.ToString().Length)
