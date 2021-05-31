@@ -14,8 +14,8 @@ namespace RadioFreeZerg.Windows
     /// <remarks>Implements support for rendering marked items.</remarks>
     public class RadioStationListSource : IListDataSource
     {
-        private BitArray marks;
-        private IList<RadioStation> stations;
+        private BitArray marks = null!;
+        private IList<RadioStation> stations = null!;
 
         public RadioStationListSource(IEnumerable<RadioStation> source) {
             Init(source.ToList());
