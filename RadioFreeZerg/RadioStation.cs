@@ -20,6 +20,7 @@ namespace RadioFreeZerg
 
         public override int GetHashCode() => Id;
 
-        public override string ToString() => $"{Title} [{Genre}]";
+        public override string ToString() =>
+            $"{Id}: {Title} [{Genre}]{(!string.IsNullOrWhiteSpace(Language) ? $" [{Language}]" : "")}";
     }
 }
