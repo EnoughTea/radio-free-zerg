@@ -42,12 +42,17 @@ namespace RadioFreeZerg
 
         public IEnumerable<RadioStation> Find(string userInput) => finder.Find(userInput, All);
 
-        public void Play(RadioStation station) {
-            player.Play(station);
+        public void Play(RadioStation stationToPlay) {
+            player.Play(stationToPlay);
         }
         
         public void Stop() {
             player.Stop();
+        }
+
+        public void TogglePlay(RadioStation stationToPlay) {
+            if (CurrentStation == stationToPlay) Stop();
+            else Play(stationToPlay);
         }
     }
 }
