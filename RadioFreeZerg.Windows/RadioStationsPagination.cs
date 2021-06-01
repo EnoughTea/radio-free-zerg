@@ -8,7 +8,6 @@ namespace RadioFreeZerg.Windows
     {
         private readonly int limit;
         private IReadOnlyCollection<RadioStation> allStations;
-        private int currentPage;
 
         public RadioStationsPagination() : this(Array.Empty<RadioStation>()) { }
 
@@ -29,16 +28,18 @@ namespace RadioFreeZerg.Windows
             }
         }
 
-        public int MaxPage => (int) Math.Ceiling(allStations.Count / (float) limit) - 1;
+        public int MaxPage => (int) Math.Max(0, Math.Ceiling(allStations.Count / (float) limit) - 1);
 
-        public bool HasNext() => currentPage * limit + limit < allStations.Count;
+        public int CurrentPage { get; private set; }
 
-        public bool HasPrevious() => currentPage > 0;
+        public bool HasNext() => CurrentPage * limit + limit < allStations.Count;
+
+        public bool HasPrevious() => CurrentPage > 0;
 
         public bool Next() {
             if (!HasNext()) return false;
 
-            currentPage++;
+            CurrentPage++;
             UpdateCurrentPageStations();
             return true;
         }
@@ -46,7 +47,7 @@ namespace RadioFreeZerg.Windows
         public bool Previous() {
             if (!HasPrevious()) return false;
 
-            currentPage--;
+            CurrentPage--;
             UpdateCurrentPageStations();
             return true;
         }
@@ -54,12 +55,12 @@ namespace RadioFreeZerg.Windows
         public bool GoTo(int page) {
             if (page < 0 || page > MaxPage) return false;
 
-            currentPage = page;
+            CurrentPage = page;
             UpdateCurrentPageStations();
             return true;
         }
 
-        private void UpdateCurrentPageStations() => CurrentPageStations = Page(currentPage).ToList();
+        private void UpdateCurrentPageStations() => CurrentPageStations = Page(CurrentPage).ToList();
 
         private IEnumerable<RadioStation> Page(int page) => allStations.Skip(page * limit).Take(limit);
     }
