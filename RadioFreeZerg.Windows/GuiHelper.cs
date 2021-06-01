@@ -4,28 +4,28 @@ namespace RadioFreeZerg.Windows
 {
     public static class GuiHelper
     {
-        public static void SetupScrollBars(ListView stationsListView) {
-            var stationsScrollBar = new ScrollBarView(stationsListView, true);
+        public static void SetupScrollBars(ListView listView) {
+            var stationsScrollBar = new ScrollBarView(listView, true);
 
             stationsScrollBar.ChangedPosition += () => {
-                stationsListView.TopItem = stationsScrollBar.Position;
-                if (stationsListView.TopItem != stationsScrollBar.Position)
-                    stationsScrollBar.Position = stationsListView.TopItem;
-                stationsListView.SetNeedsDisplay();
+                listView.TopItem = stationsScrollBar.Position;
+                if (listView.TopItem != stationsScrollBar.Position)
+                    stationsScrollBar.Position = listView.TopItem;
+                listView.SetNeedsDisplay();
             };
 
             stationsScrollBar.OtherScrollBarView.ChangedPosition += () => {
-                stationsListView.LeftItem = stationsScrollBar.OtherScrollBarView.Position;
-                if (stationsListView.LeftItem != stationsScrollBar.OtherScrollBarView.Position)
-                    stationsScrollBar.OtherScrollBarView.Position = stationsListView.LeftItem;
-                stationsListView.SetNeedsDisplay();
+                listView.LeftItem = stationsScrollBar.OtherScrollBarView.Position;
+                if (listView.LeftItem != stationsScrollBar.OtherScrollBarView.Position)
+                    stationsScrollBar.OtherScrollBarView.Position = listView.LeftItem;
+                listView.SetNeedsDisplay();
             };
 
-            stationsListView.DrawContent += _ => {
-                stationsScrollBar.Size = stationsListView.Source.Count - 1;
-                stationsScrollBar.Position = stationsListView.TopItem;
-                stationsScrollBar.OtherScrollBarView.Size = stationsListView.Maxlength - 1;
-                stationsScrollBar.OtherScrollBarView.Position = stationsListView.LeftItem;
+            listView.DrawContent += _ => {
+                stationsScrollBar.Size = listView.Source.Count - 1;
+                stationsScrollBar.Position = listView.TopItem;
+                stationsScrollBar.OtherScrollBarView.Size = listView.Maxlength - 1;
+                stationsScrollBar.OtherScrollBarView.Position = listView.LeftItem;
                 stationsScrollBar.Refresh();
             };
         }
