@@ -32,11 +32,15 @@ namespace RadioFreeZerg
         }
 
         public void Play(Uri source) {
+            // I don't know when VLC actually ends its play-related buffering and stuff,
+            // so lets keep this method sync with wait on media parsing.
             lock (locker) {
                 ClearMedia();
                 mediaPlayer.Media = new Media(LibVlc, source, ":no-video");
+                var parseTask = mediaPlayer.Media.Parse();
                 mediaPlayer.Media.MetaChanged += MetaChanged;
                 mediaPlayer.Play();
+                parseTask.GetAwaiter().GetResult();
             }
         }
 
