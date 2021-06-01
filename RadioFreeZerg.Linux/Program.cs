@@ -1,6 +1,6 @@
 ﻿using RadioFreeZerg.Gui;
 
-namespace RadioFreeZerg.Windows
+namespace RadioFreeZerg.Linux
 {
     internal class Program
     {

@@ -5,7 +5,7 @@ using System.Linq;
 using NStack;
 using Terminal.Gui;
 
-namespace RadioFreeZerg.Windows
+namespace RadioFreeZerg.Gui
 {
     /// <summary>
     ///     Implements an <see cref="T:Terminal.Gui.IListDataSource" /> that renders <see cref="RadioStation" />s

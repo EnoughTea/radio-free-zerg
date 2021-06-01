@@ -1,6 +1,6 @@
 ﻿using Terminal.Gui;
 
-namespace RadioFreeZerg.Windows
+namespace RadioFreeZerg.Gui
 {
     public static class GuiHelper
     {

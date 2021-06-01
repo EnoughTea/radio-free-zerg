@@ -1,7 +1,7 @@
 ﻿using NStack;
 using Terminal.Gui;
 
-namespace RadioFreeZerg.Windows
+namespace RadioFreeZerg.Gui
 {
     public class InputPrompt : Dialog
     {

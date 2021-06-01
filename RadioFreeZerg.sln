@@ -6,6 +6,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RadioFreeZerg", "RadioFreeZ
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RadioFreeZerg.Windows", "RadioFreeZerg.Windows\RadioFreeZerg.Windows.csproj", "{38EAFF41-3ED9-4E13-8B66-5427F3CFB532}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RadioFreeZerg.Linux", "RadioFreeZerg.Linux\RadioFreeZerg.Linux.csproj", "{15FFF50A-3103-446E-B8CB-DA50BE144CF9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RadioFreeZerg.Mac", "RadioFreeZerg.Mac\RadioFreeZerg.Mac.csproj", "{AB411873-DF08-4A9F-9EE1-BF8976992881}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +28,13 @@ Global
 		{38EAFF41-3ED9-4E13-8B66-5427F3CFB532}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{38EAFF41-3ED9-4E13-8B66-5427F3CFB532}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{38EAFF41-3ED9-4E13-8B66-5427F3CFB532}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15FFF50A-3103-446E-B8CB-DA50BE144CF9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15FFF50A-3103-446E-B8CB-DA50BE144CF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15FFF50A-3103-446E-B8CB-DA50BE144CF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15FFF50A-3103-446E-B8CB-DA50BE144CF9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB411873-DF08-4A9F-9EE1-BF8976992881}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB411873-DF08-4A9F-9EE1-BF8976992881}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB411873-DF08-4A9F-9EE1-BF8976992881}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB411873-DF08-4A9F-9EE1-BF8976992881}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

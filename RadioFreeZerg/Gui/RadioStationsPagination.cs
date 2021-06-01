@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace RadioFreeZerg.Windows
+namespace RadioFreeZerg.Gui
 {
     public class RadioStationsPagination
     {
