@@ -4,13 +4,14 @@ using System.Globalization;
 using System.Linq;
 using LibVLCSharp.Shared;
 using Terminal.Gui;
+using Attribute = Terminal.Gui.Attribute;
 
 namespace RadioFreeZerg.Windows
 {
     internal class Program
     {
         private static readonly Random Rng = new();
-        
+
         private static void Main(string[] args) {
             Core.Initialize();
             var radioStationsProvider = new CuteRadioStationProviderJson("stations.json");
@@ -27,20 +28,41 @@ namespace RadioFreeZerg.Windows
                 Height = Dim.Fill()
             };
             top.Add(mainWindow);
+
             var stationsListViewRef = new Reference<ListView>();
-            var statusBar = CreateStatusBar(top, stationsListViewRef, radioStations, pagination);
-            var stationsListView = CreateStationsListView(mainWindow, statusBar, radioStations, pagination);
+            var nowPlayingLabelRef = new Reference<Label>();
+            var statusBar = CreateStatusBar(top, mainWindow, stationsListViewRef, nowPlayingLabelRef, radioStations,
+                pagination);
+            var stationsListView =
+                CreateStationsListView(mainWindow, statusBar, nowPlayingLabelRef, radioStations, pagination);
             stationsListViewRef.Value = stationsListView;
+            var nowPlayingLabel = CreateNowPlaying(mainWindow, stationsListView);
+            nowPlayingLabelRef.Value = nowPlayingLabel;
+
             Application.Run();
         }
 
-        private static StatusItem PrevItem(StatusBar statusBar) => statusBar.Items[0];
-        private static StatusItem PagesItem(StatusBar statusBar) => statusBar.Items[1];
-        private static StatusItem NextItem(StatusBar statusBar) => statusBar.Items[2];
-        private static StatusItem PlayingItem(StatusBar statusBar) => statusBar.Items[5];
+        private static Label CreateNowPlaying(View mainWindow, ListView stationsListView) {
+            var nowPlayingColors = new ColorScheme {
+                Normal = new Attribute(Color.BrightYellow, stationsListView.ColorScheme.Normal.Background)
+            };
+            var nowPlayingLabel = new Label {
+                X = 1,
+                Y = Pos.Bottom(stationsListView) - 1,
+                Width = Dim.Fill(1),
+                Height = 1,
+                CanFocus = false,
+                ColorScheme = nowPlayingColors,
+                Text = "Nothing is playing"
+            };
+            mainWindow.Add(nowPlayingLabel);
+            return nowPlayingLabel;
+        }
 
         private static StatusBar CreateStatusBar(View top,
+                                                 View mainWindow,
                                                  Reference<ListView> stationsListView,
+                                                 Reference<Label> nowPlayingLabel,
                                                  RadioStationManager radioStations,
                                                  RadioStationsPagination pagination) {
             var statusBar = new StatusBar();
@@ -68,23 +90,79 @@ namespace RadioFreeZerg.Windows
                     if (stationsToChooseFrom.Count > 0) {
                         var rngStationIndex = Rng.Next(0, stationsToChooseFrom.Count);
                         var chosenStation = stationsToChooseFrom.ElementAt(rngStationIndex);
-                        radioStations.TogglePlay(chosenStation);
+                        radioStations.Play(chosenStation);
+                        RefreshNowPlaying(mainWindow, nowPlayingLabel, radioStations);
                     }
                 }),
-                new(Key.CharMask, "Nothing is playing", null),
+                new(Key.CtrlMask | Key.T, "~^T~ Toggle", () => {
+                    radioStations.TogglePlay(RadioStation.Empty);
+                    RefreshNowPlaying(mainWindow, nowPlayingLabel, radioStations);
+                }),
                 new(Key.CtrlMask | Key.Q, "~^Q~ Quit", Application.RequestStop)
             };
             top.Add(statusBar);
 
             radioStations.NowPlayingChanged += nowPlaying => {
+                RefreshNowPlaying(mainWindow, nowPlayingLabel, radioStations);
                 var hasNowPlaying = radioStations.CurrentStation != RadioStation.Empty &&
                     !string.IsNullOrEmpty(nowPlaying);
                 var stationTitle = $"{radioStations.CurrentStation.Id}: {radioStations.CurrentStation.Title}";
-                PlayingItem(statusBar).Title = hasNowPlaying ? $"'{nowPlaying}' at {stationTitle}" : $"Unknown song at {stationTitle}";
-                statusBar.SetNeedsDisplay();
+                if (nowPlayingLabel.Value != null) {
+                    nowPlayingLabel.Value.Text = hasNowPlaying
+                        ? $"'{nowPlaying}' at {stationTitle}"
+                        : $"Unknown song at {stationTitle}";
+                    mainWindow.SetNeedsDisplay();
+                }
             };
 
             return statusBar;
+        }
+
+        private static StatusItem PrevItem(StatusBar statusBar) => statusBar.Items[0];
+        private static StatusItem PagesItem(StatusBar statusBar) => statusBar.Items[1];
+        private static StatusItem NextItem(StatusBar statusBar) => statusBar.Items[2];
+
+        private static ListView CreateStationsListView(View mainWindow,
+                                                       StatusBar statusBar,
+                                                       Reference<Label> nowPlayingLabelRef,
+                                                       RadioStationManager radioStations,
+                                                       RadioStationsPagination pagination) {
+            var stationsListView = new ListView {
+                X = 1,
+                Y = 0,
+                Height = Dim.Fill(),
+                Width = Dim.Fill(1),
+                AllowsMarking = false,
+                AllowsMultipleSelection = false
+            };
+
+            stationsListView.OpenSelectedItem += eventArgs => {
+                radioStations.TogglePlay((RadioStation) eventArgs.Value);
+                RefreshNowPlaying(mainWindow, nowPlayingLabelRef, radioStations);
+            };
+            mainWindow.Add(stationsListView);
+            ChangeAvailableStations(statusBar, stationsListView, pagination);
+            GuiHelper.SetupScrollBars(stationsListView);
+            return stationsListView;
+        }
+
+        private static void RefreshNowPlaying(View mainWindow,
+                                              Reference<Label> nowPlayingLabel,
+                                              RadioStationManager radioStations) {
+            if (nowPlayingLabel.Value != null) {
+                var stationTitle = radioStations.CurrentStation != RadioStation.Empty
+                    ? $"{radioStations.CurrentStation.Id}: {radioStations.CurrentStation.Title}"
+                    : "";
+                var hasNowPlaying = radioStations.CurrentStation != RadioStation.Empty &&
+                    !string.IsNullOrWhiteSpace(radioStations.NowPlaying) &&
+                    radioStations.NowPlaying.Trim().Length > 2;
+                nowPlayingLabel.Value.Text = hasNowPlaying
+                    ? $"'{radioStations.NowPlaying}' at {stationTitle}"
+                    : !string.IsNullOrEmpty(stationTitle)
+                        ? $"Unknown song at {stationTitle}"
+                        : "Nothing is playing";
+                mainWindow.SetNeedsDisplay();
+            }
         }
 
         private static void FindStations(StatusBar statusBar,
@@ -110,27 +188,6 @@ namespace RadioFreeZerg.Windows
             PagesItem(statusBar).Title = $"{pagination.CurrentPage}/{pagination.MaxPage}";
             statusBar.SetNeedsDisplay();
             stationsListView.Source = new RadioStationListSource(pagination.CurrentPageStations);
-        }
-
-        private static ListView CreateStationsListView(View window,
-                                                       StatusBar statusBar,
-                                                       RadioStationManager radioStations,
-                                                       RadioStationsPagination pagination) {
-            var stationsListView = new ListView {
-                X = 1,
-                Y = 0,
-                Height = Dim.Fill(),
-                Width = Dim.Fill(1),
-                AllowsMarking = false,
-                AllowsMultipleSelection = false
-            };
-
-            stationsListView.OpenSelectedItem +=
-                eventArgs => radioStations.TogglePlay((RadioStation) eventArgs.Value);
-            window.Add(stationsListView);
-            ChangeAvailableStations(statusBar, stationsListView, pagination);
-            GuiHelper.SetupScrollBars(stationsListView);
-            return stationsListView;
         }
 
         public class Reference<T>
