@@ -4,18 +4,32 @@ namespace RadioFreeZerg
 {
     public class RadioStationPlayer
     {
+        private readonly object locker = new();
         private readonly RadioStationManager manager;
         private readonly AudioPlayer player;
-        private readonly object locker = new();
-        
-        public RadioStation CurrentStation { get; private set; } = RadioStation.Empty;
 
         public RadioStationPlayer(RadioStationManager radioStationManagermanager) {
             manager = radioStationManagermanager;
             player = new AudioPlayer();
         }
-        
-        
+
+        public RadioStation CurrentStation { get; private set; } = RadioStation.Empty;
+
+        public string NowPlaying => player.NowPlaying;
+
+        public event Action<string> NowPlayingChanged {
+            add {
+                lock (locker) {
+                    player.NowPlayingChanged += value;
+                }
+            }
+            remove {
+                lock (locker) {
+                    player.NowPlayingChanged -= value;
+                }
+            }
+        }
+
         public void Play(int stationId) {
             var foundStation = manager.Find(stationId);
             if (foundStation == RadioStation.Empty)

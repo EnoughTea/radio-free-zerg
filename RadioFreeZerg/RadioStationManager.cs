@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -17,7 +18,14 @@ namespace RadioFreeZerg
             player = new RadioStationPlayer(this);
         }
 
-        public RadioStation CurrentlyPlaying => player.CurrentStation;
+        public string NowPlaying => player.NowPlaying;
+
+        public event Action<string> NowPlayingChanged {
+            add => player.NowPlayingChanged += value;
+            remove => player.NowPlayingChanged -= value;
+        }
+        
+        public RadioStation CurrentStation => player.CurrentStation;
         
         public IReadOnlyCollection<RadioStation> All => stations.Values;
 
@@ -25,7 +33,6 @@ namespace RadioFreeZerg
             ((IEnumerable<RadioStation>) stations.Values).GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
 
         public RadioStation Find(int stationId) {
             if (!stations.TryGetValue(stationId, out var foundStation)) foundStation = RadioStation.Empty;
