@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Threading;
 using LibVLCSharp.Shared;
 
 namespace RadioFreeZerg
@@ -10,7 +12,20 @@ namespace RadioFreeZerg
 
         private readonly object locker = new();
         private readonly MediaPlayer mediaPlayer = new(LibVlc);
+        private string nowPlaying = "";
 
+        public string NowPlaying {
+            get => nowPlaying;
+            private set {
+                if (nowPlaying != value) {
+                    nowPlaying = value;
+                    NowPlayingChanged(value);
+                }
+            }
+        }
+
+        public event Action<string> NowPlayingChanged = delegate {};
+        
         public void Dispose() {
             Dispose(true);
             GC.SuppressFinalize(this);
@@ -18,9 +33,16 @@ namespace RadioFreeZerg
 
         public void Play(Uri source) {
             lock (locker) {
-                mediaPlayer.Media?.Dispose();
+                ClearMedia();
                 mediaPlayer.Media = new Media(LibVlc, source, ":no-video");
+                mediaPlayer.Media.MetaChanged += MetaChanged;
                 mediaPlayer.Play();
+            }
+        }
+
+        private void MetaChanged(object? sender, MediaMetaChangedEventArgs args) {
+            if (args.MetadataType == MetadataType.NowPlaying) {
+                NowPlaying = mediaPlayer.Media?.Meta(MetadataType.NowPlaying) ?? "";
             }
         }
 
@@ -34,14 +56,24 @@ namespace RadioFreeZerg
         public void Stop() {
             lock (locker) {
                 mediaPlayer.Stop();
-                mediaPlayer.Media?.Dispose();
-                mediaPlayer.Media = null;
+                ClearMedia();
+            }
+        }
+
+        private void ClearMedia() {
+            var media = mediaPlayer.Media;
+            mediaPlayer.Media = null;
+            if (media != null) {
+                media.MetaChanged -= MetaChanged;
+                media.Dispose();
             }
         }
 
         private void ReleaseUnmanagedResources() {
-            mediaPlayer.Media?.Dispose();
-            mediaPlayer.Dispose();
+            lock (locker) {
+                ClearMedia();
+                mediaPlayer.Dispose();
+            }
         }
 
         private void Dispose(bool disposing) {
