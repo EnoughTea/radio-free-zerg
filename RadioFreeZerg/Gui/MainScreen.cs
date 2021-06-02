@@ -54,8 +54,12 @@ namespace RadioFreeZerg.Gui
 
             var previouslyToggledStation = radioStations.Find(state.ToggledStationId);
             radioStations.ToggledStation = previouslyToggledStation;
+            
             var previouslyPlayedStation = radioStations.Find(state.CurrentStationId);
-            if (previouslyPlayedStation != RadioStation.Empty) radioStations.Play(previouslyPlayedStation);
+            if (previouslyPlayedStation != RadioStation.Empty) {
+                radioStations.Play(previouslyPlayedStation);
+                RefreshNowPlaying();
+            }
         }
 
         private StatusItem PrevItem => statusBar.Items[0];

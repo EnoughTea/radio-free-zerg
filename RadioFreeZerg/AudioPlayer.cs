@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using LibVLCSharp.Shared;
 using NLog;
 
@@ -14,6 +15,9 @@ namespace RadioFreeZerg
         private readonly object locker = new();
         private readonly MediaPlayer mediaPlayer = new(LibVlc);
         private string nowPlaying = "";
+        private int volume = 100;
+
+        public AudioPlayer() => mediaPlayer.AudioDevice += UpdateVolume;
 
         public string NowPlaying {
             get => nowPlaying;
@@ -29,14 +33,15 @@ namespace RadioFreeZerg
         public int Volume {
             get {
                 lock (locker) {
-                    return mediaPlayer.Volume;
+                    // Don't use MediaPlayer.Volume as a backend, it will return -1 after current media is disposed.
+                    return volume;
                 }
             }
 
             set {
                 lock (locker) {
-                    var clampedVolume = Math.Clamp(value, 0, 100);
-                    mediaPlayer.Volume = clampedVolume;
+                    volume = Math.Clamp(value, 0, 100);
+                    mediaPlayer.Volume = volume;
                 }
             }
         }
@@ -63,6 +68,13 @@ namespace RadioFreeZerg
             }
         }
 
+        private void UpdateVolume(object? sender, MediaPlayerAudioDeviceEventArgs args) {
+            // This way volume can be set even without media playing. As for the delay,
+            // volume actually requires audio device, and real audio device becomes ready to set
+            // slightly after this callback activates. Thanks VLC.
+            Task.Delay(100).ContinueWith(_ => Volume = volume);
+        }
+
         private void MetaChanged(object? sender, MediaMetaChangedEventArgs args) {
             if (args.MetadataType == MetadataType.NowPlaying)
                 NowPlaying = mediaPlayer.Media?.Meta(MetadataType.NowPlaying) ?? "";
@@ -73,6 +85,7 @@ namespace RadioFreeZerg
                 if (mediaPlayer.Media != null) Log.Debug($"AudioPlayer stops playing '{mediaPlayer.Media.Mrl}'.");
 
                 mediaPlayer.Stop();
+                mediaPlayer.Volume = volume;
                 ClearMedia();
             }
         }
