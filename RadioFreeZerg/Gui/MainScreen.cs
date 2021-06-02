@@ -17,13 +17,19 @@ namespace RadioFreeZerg.Gui
         private readonly Label nowPlayingLabel;
         private readonly RadioStationsPagination pagination;
         private readonly RadioStationManager radioStations;
+        private readonly UserState state;
         private readonly ListView stationsListView;
         private readonly StatusBar statusBar;
 
-        public MainScreen(RadioStationManager radioStationManager) {
+        public MainScreen(RadioStationManager radioStationManager, UserState userState) {
             radioStations = radioStationManager;
-            pagination = new RadioStationsPagination(radioStations.All);
-            pagination.GoTo(Rng.Next(0, pagination.MaxPage + 1));
+            state = userState;
+            radioStations.Volume = state.Volume;
+            pagination = new RadioStationsPagination(state.AvailableStationsIds.Count == 0
+                ? radioStations.All
+                : radioStations.Where(_ => state.AvailableStationsIds.Contains(_.Id)).ToList());
+
+            pagination.GoTo(Math.Clamp(state.CurrentPage, 0, pagination.MaxPage));
 
             Toplevel top = Application.Top;
             mainWindow = CreateMainWindow(RadioFreeZerg.MainScreen.MainScreenTitleText);
@@ -45,6 +51,11 @@ namespace RadioFreeZerg.Gui
                 RefreshNowPlaying();
             };
             radioStations.NowPlayingChanged += _ => RefreshNowPlaying();
+
+            var previouslyToggledStation = radioStations.Find(state.ToggledStationId);
+            radioStations.ToggledStation = previouslyToggledStation;
+            var previouslyPlayedStation = radioStations.Find(state.CurrentStationId);
+            if (previouslyPlayedStation != RadioStation.Empty) radioStations.Play(previouslyPlayedStation);
         }
 
         private StatusItem PrevItem => statusBar.Items[0];
@@ -96,6 +107,10 @@ namespace RadioFreeZerg.Gui
                     ? string.Format(RadioFreeZerg.MainScreen.NowPlayingUnknownText, stationTitle)
                     : RadioFreeZerg.MainScreen.NowPlayingNothingText;
             mainWindow.SetNeedsDisplay();
+
+            state.ToggledStationId = radioStations.ToggledStation.Id;
+            state.CurrentStationId = radioStations.CurrentStation.Id;
+            state.Save();
         }
 
         public void RefreshStationList() {
@@ -110,6 +125,10 @@ namespace RadioFreeZerg.Gui
             PagesItem.Title = $"{pagination.CurrentPage + 1}/{pagination.MaxPage + 1}";
             statusBar.SetNeedsDisplay();
             stationsListView.Source = new RadioStationListSource(pagination.CurrentPageStations);
+
+            state.CurrentPage = pagination.CurrentPage;
+            state.AvailableStationsIds = pagination.AllStations.Select(_ => _.Id).ToList();
+            state.Save();
         }
 
         public void PromptFindStations() {

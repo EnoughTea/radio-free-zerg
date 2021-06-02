@@ -13,7 +13,7 @@ namespace RadioFreeZerg
     {
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
         
-        private static readonly JsonSerializer Serializer = new() {
+        internal static readonly JsonSerializer Serializer = new() {
             ContractResolver = new CamelCasePropertyNamesContractResolver(),
             Culture = CultureInfo.InvariantCulture,
             DateTimeZoneHandling = DateTimeZoneHandling.Utc,

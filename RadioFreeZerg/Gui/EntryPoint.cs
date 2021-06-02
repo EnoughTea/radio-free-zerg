@@ -25,7 +25,8 @@ namespace RadioFreeZerg.Gui
             Log.Debug("Created radio stations manager.");
             
             Log.Debug("Creating main screen...");
-            mainScreen = new MainScreen(radioStations);
+            var userSettings = UserState.Load();
+            mainScreen = new MainScreen(radioStations, userSettings);
             mainScreen.RefreshStationList();
 
             Log.Debug("Running GUI...");

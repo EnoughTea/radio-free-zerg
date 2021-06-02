@@ -12,12 +12,11 @@ namespace RadioFreeZerg
         private readonly RadioStationFinder finder;
         private readonly RadioStationPlayer player;
         private readonly Dictionary<int, RadioStation> stations;
-        private RadioStation toggledStation;
 
         public RadioStationManager(ICuteRadioStationProvider radioStationsProvider) {
             stations = radioStationsProvider.Select(_ => _.ToRadioStation())
                                             .ToDictionary(_ => _.Id);
-            toggledStation = RadioStation.Empty;
+            ToggledStation = RadioStation.Empty;
             finder = new RadioStationFinder();
             player = new RadioStationPlayer(this);
         }
@@ -25,6 +24,8 @@ namespace RadioFreeZerg
         public string NowPlaying => player.NowPlaying;
 
         public RadioStation CurrentStation => player.CurrentStation;
+
+        public RadioStation ToggledStation { get; set; }
 
         public IReadOnlyCollection<RadioStation> All => stations.Values;
 
@@ -72,11 +73,11 @@ namespace RadioFreeZerg
             Log.Info($"Request to toggle [{CurrentStation.Id}: {CurrentStation.Title}] with " +
                 $"[{stationToPlay.Id}: {stationToPlay.Title}]");
             if (CurrentStation != RadioStation.Empty) {
-                toggledStation = CurrentStation;
+                ToggledStation = CurrentStation;
                 if (stationToPlay != CurrentStation) Play(stationToPlay);
                 else Stop();
             } else {
-                Play(stationToPlay != RadioStation.Empty ? stationToPlay : toggledStation);
+                Play(stationToPlay != RadioStation.Empty ? stationToPlay : ToggledStation);
             }
         }
     }
