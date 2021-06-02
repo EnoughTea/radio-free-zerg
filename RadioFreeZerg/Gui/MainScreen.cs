@@ -199,7 +199,7 @@ namespace RadioFreeZerg.Gui
             new() {
                 X = 1,
                 Y = 0,
-                Height = Dim.Fill() - 1,
+                Height = Dim.Fill(1),
                 Width = Dim.Fill(1),
                 AllowsMarking = false,
                 AllowsMultipleSelection = false
