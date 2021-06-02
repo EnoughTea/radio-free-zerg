@@ -115,7 +115,7 @@ namespace RadioFreeZerg {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No next items.
+        ///   Looks up a localized string similar to No next.
         /// </summary>
         internal static string NoNextItemsText {
             get {
@@ -124,7 +124,7 @@ namespace RadioFreeZerg {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No previous items.
+        ///   Looks up a localized string similar to No previous.
         /// </summary>
         internal static string NoPreviousItemsText {
             get {
@@ -192,6 +192,24 @@ namespace RadioFreeZerg {
         internal static string ToggleCurrentStationText {
             get {
                 return ResourceManager.GetString("ToggleCurrentStationText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to -.
+        /// </summary>
+        internal static string VolumeDownText {
+            get {
+                return ResourceManager.GetString("VolumeDownText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to +.
+        /// </summary>
+        internal static string VolumeUpText {
+            get {
+                return ResourceManager.GetString("VolumeUpText", resourceCulture);
             }
         }
     }

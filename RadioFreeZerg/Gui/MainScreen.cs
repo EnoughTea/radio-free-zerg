@@ -9,6 +9,7 @@ namespace RadioFreeZerg.Gui
 {
     public class MainScreen
     {
+        private const int VolumeIncrement = 1;
         private static readonly Random Rng = new();
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
@@ -37,6 +38,7 @@ namespace RadioFreeZerg.Gui
 
             statusBar = CreateStatusBar();
             top.Add(statusBar);
+            RefreshVolume();
 
             stationsListView.OpenSelectedItem += args => {
                 radioStations.TogglePlay((RadioStation) args.Value);
@@ -48,6 +50,7 @@ namespace RadioFreeZerg.Gui
         private StatusItem PrevItem => statusBar.Items[0];
         private StatusItem PagesItem => statusBar.Items[1];
         private StatusItem NextItem => statusBar.Items[2];
+        private StatusItem CurrentVolumeItem => statusBar.Items[7];
 
         public void ListPreviousStations() {
             Log.Trace("Listing previous stations.");
@@ -128,6 +131,24 @@ namespace RadioFreeZerg.Gui
             }
         }
 
+        public void VolumeDown() {
+            radioStations.Volume -= VolumeIncrement;
+            RefreshVolume();
+        }
+
+        public void VolumeUp() {
+            radioStations.Volume += VolumeIncrement;
+            RefreshVolume();
+        }
+
+        private void RefreshVolume() {
+            CurrentVolumeItem.Title = $"{radioStations.Volume} %";
+            statusBar.SetNeedsDisplay();
+
+            state.Volume = radioStations.Volume;
+            state.Save();
+        }
+
         private static View CreateMainWindow(string title) =>
             new Window(title) {
                 X = 0,
@@ -167,11 +188,14 @@ namespace RadioFreeZerg.Gui
                     new(Key.CtrlMask | Key.S, "", ListPreviousStations),
                     new(Key.CharMask, $"{pagination.CurrentPage}/{pagination.MaxPage}", null),
                     new(Key.CtrlMask | Key.D, "", ListNextStations),
-                    new(Key.CtrlMask | Key.G, $"~^G~ {RadioFreeZerg.MainScreen.FindStationsText}", PromptFindStations),
+                    new(Key.CtrlMask | Key.F, $"~^F~ {RadioFreeZerg.MainScreen.FindStationsText}", PromptFindStations),
                     new(Key.CtrlMask | Key.R, $"~^R~ {RadioFreeZerg.MainScreen.PlayRandomStationText}",
                         PlayRandomStation),
                     new(Key.CtrlMask | Key.T, $"~^T~ {RadioFreeZerg.MainScreen.ToggleCurrentStationText}",
                         ToggleCurrentStation),
+                    new(Key.CtrlMask | Key.B, $"~^B~ {RadioFreeZerg.MainScreen.VolumeDownText}", VolumeDown),
+                    new(Key.CharMask, "", null),
+                    new(Key.CtrlMask | Key.G, $"~^G~ {RadioFreeZerg.MainScreen.VolumeUpText}", VolumeUp),
                     new(Key.CtrlMask | Key.Q, $"~^Q~ {RadioFreeZerg.MainScreen.QuitAppText}", Application.RequestStop)
                 }
             };

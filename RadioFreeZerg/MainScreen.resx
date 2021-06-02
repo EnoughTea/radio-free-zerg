@@ -25,10 +25,10 @@
         <value>Next</value>
     </data>
     <data name="NoNextItemsText" xml:space="preserve">
-        <value>No next items</value>
+        <value>No next</value>
     </data>
     <data name="NoPreviousItemsText" xml:space="preserve">
-        <value>No previous items</value>
+        <value>No previous</value>
     </data>
     <data name="FindStationsPromptText" xml:space="preserve">
         <value>Enter title keywords or station ID</value>
@@ -62,5 +62,11 @@
     </data>
     <data name="QuitAppText" xml:space="preserve">
         <value>Quit</value>
+    </data>
+    <data name="VolumeUpText" xml:space="preserve">
+        <value>+</value>
+    </data>
+    <data name="VolumeDownText" xml:space="preserve">
+        <value>-</value>
     </data>
 </root>
