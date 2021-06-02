@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using LibVLCSharp.Shared;
 using NLog;
 
@@ -16,8 +15,6 @@ namespace RadioFreeZerg
         private readonly MediaPlayer mediaPlayer = new(LibVlc);
         private string nowPlaying = "";
         private int volume = 100;
-
-        public AudioPlayer() => mediaPlayer.AudioDevice += UpdateVolume;
 
         public string NowPlaying {
             get => nowPlaying;
@@ -63,16 +60,19 @@ namespace RadioFreeZerg
                 var parseTask = mediaPlayer.Media.Parse();
                 mediaPlayer.Media.MetaChanged += MetaChanged;
                 mediaPlayer.Play();
+                mediaPlayer.TimeChanged += UpdateVolume;
                 parseTask.GetAwaiter().GetResult();
                 Log.Debug($"Playing of '{source.AbsoluteUri}' has been started.");
             }
         }
 
-        private void UpdateVolume(object? sender, MediaPlayerAudioDeviceEventArgs args) {
-            // This way volume can be set even without media playing. As for the delay,
-            // volume actually requires audio device, and real audio device becomes ready to set
-            // slightly after this callback activates. Thanks VLC.
-            Task.Delay(100).ContinueWith(_ => Volume = volume);
+        /// <summary> This callback passes through volume changes made without VLC media. </summary>
+        /// <remarks>
+        ///     Setting volume requires audio device, which becomes ready slightly after VLC media starts playing.
+        /// </remarks>
+        private void UpdateVolume(object? sender, MediaPlayerTimeChangedEventArgs args) {
+            Volume = volume;
+            mediaPlayer.TimeChanged -= UpdateVolume;
         }
 
         private void MetaChanged(object? sender, MediaMetaChangedEventArgs args) {
