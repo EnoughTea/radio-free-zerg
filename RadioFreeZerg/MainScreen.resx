@@ -40,7 +40,7 @@
         <value>Cancel</value>
     </data>
     <data name="MainScreenTitleText" xml:space="preserve">
-        <value>Radio stations:</value>
+        <value>Radio stations (double click or Enter to play)</value>
     </data>
     <data name="NowPlayingSongText" xml:space="preserve">
         <value>'{0}' at {1}</value>

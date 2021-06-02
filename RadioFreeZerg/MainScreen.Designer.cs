@@ -97,7 +97,7 @@ namespace RadioFreeZerg {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Radio stations:.
+        ///   Looks up a localized string similar to Radio stations (double click or Enter to play).
         /// </summary>
         internal static string MainScreenTitleText {
             get {
