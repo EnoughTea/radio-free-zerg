@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
+using NLog;
 using Terminal.Gui;
 using Attribute = Terminal.Gui.Attribute;
 
@@ -9,6 +10,8 @@ namespace RadioFreeZerg.Gui
     public class MainScreen
     {
         private static readonly Random Rng = new();
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
+
         private readonly View mainWindow;
         private readonly Label nowPlayingLabel;
         private readonly RadioStationsPagination pagination;
@@ -47,11 +50,13 @@ namespace RadioFreeZerg.Gui
         private StatusItem NextItem => statusBar.Items[2];
 
         public void ListPreviousStations() {
+            Log.Trace("Listing previous stations.");
             pagination.Previous();
             RefreshStationList();
         }
 
         public void ListNextStations() {
+            Log.Trace("Listing next stations.");
             pagination.Next();
             RefreshStationList();
         }
@@ -66,12 +71,16 @@ namespace RadioFreeZerg.Gui
             if (stationsToChooseFrom.Count > 0) {
                 var rngStationIndex = Rng.Next(0, stationsToChooseFrom.Count);
                 var chosenStation = stationsToChooseFrom.ElementAt(rngStationIndex);
+                Log.Info($"Requested to play random station, chosen station ${chosenStation.Id}.");
                 radioStations.Play(chosenStation);
                 RefreshNowPlaying();
+            } else {
+                Log.Info("Requested to play random station, but no stations were listed.");
             }
         }
 
         public void RefreshNowPlaying() {
+            Log.Trace("Triggered NowPlaying label refresh.");
             var stationTitle = radioStations.CurrentStation != RadioStation.Empty
                 ? $"{radioStations.CurrentStation.Id}: {radioStations.CurrentStation.Title}"
                 : "";
@@ -87,27 +96,35 @@ namespace RadioFreeZerg.Gui
         }
 
         public void RefreshStationList() {
+            Log.Trace($"Triggered station list refresh for {pagination.CurrentPageStations} stations " +
+                $"at page {pagination.CurrentPage + 1}.");
             PrevItem.Title = pagination.HasPrevious()
-                ? "~^S~ " + RadioFreeZerg.MainScreen.PrevItemsText
+                ? $"~^S~ {RadioFreeZerg.MainScreen.PrevItemsText}"
                 : RadioFreeZerg.MainScreen.NoPreviousItemsText;
             NextItem.Title = pagination.HasNext()
-                ? "~^D~ " + RadioFreeZerg.MainScreen.NextItemsText
+                ? $"~^D~ {RadioFreeZerg.MainScreen.NextItemsText}"
                 : RadioFreeZerg.MainScreen.NoNextItemsText;
-            PagesItem.Title = $"{pagination.CurrentPage}/{pagination.MaxPage}";
+            PagesItem.Title = $"{pagination.CurrentPage + 1}/{pagination.MaxPage + 1}";
             statusBar.SetNeedsDisplay();
             stationsListView.Source = new RadioStationListSource(pagination.CurrentPageStations);
         }
 
         public void PromptFindStations() {
+            Log.Debug("Showing find stations prompt...");
             var (input, canceled) = InputPrompt.Display(RadioFreeZerg.MainScreen.FindStationsPromptText,
                 RadioFreeZerg.MainScreen.FindStationsConfirmationText, RadioFreeZerg.MainScreen.FindStationsCancelText);
             if (!canceled) {
-                if (int.TryParse(input, NumberStyles.Integer, CultureInfo.InvariantCulture, out var id))
+                if (int.TryParse(input, NumberStyles.Integer, CultureInfo.InvariantCulture, out var id)) {
                     pagination.AllStations = new[] {radioStations.Find(id)};
-                else
-                    pagination.AllStations = radioStations.Find(input).ToList();
+                } else {
+                    var foundStations = radioStations.Find(input).ToList();
+                    Log.Info($"Found {foundStations.Count} stations.");
+                    pagination.AllStations = foundStations;
+                }
 
                 RefreshStationList();
+            } else {
+                Log.Debug("Canceled find stations prompt.");
             }
         }
 
