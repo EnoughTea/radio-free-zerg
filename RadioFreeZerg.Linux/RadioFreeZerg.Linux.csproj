@@ -3,6 +3,10 @@
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <TargetFramework>net5.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <Company>RadKonstantin Zakharov</Company>
+        <NeutralLanguage>en-US</NeutralLanguage>
+        <AssemblyName>rfzl</AssemblyName>
     </PropertyGroup>
 
     <ItemGroup>

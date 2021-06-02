@@ -4,6 +4,9 @@
         <OutputType>Exe</OutputType>
         <TargetFramework>net5.0</TargetFramework>
         <Nullable>enable</Nullable>
+        <Company>Konstantin Zakharov</Company>
+        <Product>RadioFreeZerg</Product>
+        <AssemblyName>rfzw</AssemblyName>
     </PropertyGroup>
 
     <ItemGroup>

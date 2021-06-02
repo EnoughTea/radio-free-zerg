@@ -6,6 +6,7 @@
         <LangVersion>default</LangVersion>
         <Nullable>enable</Nullable>
         <NeutralLanguage>en-US</NeutralLanguage>
+        <Company>Konstantin Zakharov</Company>
     </PropertyGroup>
 
     <ItemGroup>
