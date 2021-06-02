@@ -18,7 +18,7 @@ namespace RadioFreeZerg
 
         public static string StateFilePath { get; } = Path.Combine(AppFolderPath, "state.json");
 
-        public IReadOnlyList<int> AvailableStationsIds { get; set; } = new List<int>();
+        public ISet<int> AvailableStationsIds { get; set; } = new HashSet<int>(50000);
 
         public int CurrentPage { get; set; }
 

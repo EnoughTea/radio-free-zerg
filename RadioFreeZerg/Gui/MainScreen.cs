@@ -54,7 +54,7 @@ namespace RadioFreeZerg.Gui
 
             var previouslyToggledStation = radioStations.Find(state.ToggledStationId);
             radioStations.ToggledStation = previouslyToggledStation;
-            
+
             var previouslyPlayedStation = radioStations.Find(state.CurrentStationId);
             if (previouslyPlayedStation != RadioStation.Empty) {
                 radioStations.Play(previouslyPlayedStation);
@@ -131,7 +131,11 @@ namespace RadioFreeZerg.Gui
             stationsListView.Source = new RadioStationListSource(pagination.CurrentPageStations);
 
             state.CurrentPage = pagination.CurrentPage;
-            state.AvailableStationsIds = pagination.AllStations.Select(_ => _.Id).ToList();
+            state.AvailableStationsIds.Clear();
+            foreach (var station in pagination.AllStations) {
+                state.AvailableStationsIds.Add(station.Id);
+            }
+
             state.Save();
         }
 
