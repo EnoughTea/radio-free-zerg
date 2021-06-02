@@ -17,6 +17,11 @@ namespace RadioFreeZerg
 
         public string NowPlaying => player.NowPlaying;
 
+        public int Volume {
+            get => player.Volume;
+            set => player.Volume = value;
+        }
+
         public event Action<string> NowPlayingChanged {
             add {
                 lock (locker) {

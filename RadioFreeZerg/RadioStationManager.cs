@@ -33,6 +33,11 @@ namespace RadioFreeZerg
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
+        public int Volume {
+            get => player.Volume;
+            set => player.Volume = value;
+        }
+        
         public event Action<string> NowPlayingChanged {
             add => player.NowPlayingChanged += value;
             remove => player.NowPlayingChanged -= value;

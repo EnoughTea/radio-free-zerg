@@ -7,6 +7,7 @@ namespace RadioFreeZerg
     public class AudioPlayer : IDisposable
     {
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
+
         private static readonly LibVLC LibVlc = new(false,
             ":quiet", ":no-keyboard-events", ":no-mouse-events", ":no-disable-screensaver", ":verbose=-1");
 
@@ -21,6 +22,21 @@ namespace RadioFreeZerg
                     nowPlaying = value;
                     Log.Trace($"AudioPlayer.NowPlaying changed to: {nowPlaying}");
                     NowPlayingChanged(value);
+                }
+            }
+        }
+
+        public int Volume {
+            get {
+                lock (locker) {
+                    return mediaPlayer.Volume;
+                }
+            }
+
+            set {
+                lock (locker) {
+                    var clampedVolume = Math.Clamp(value, 0, 100);
+                    mediaPlayer.Volume = clampedVolume;
                 }
             }
         }
@@ -52,18 +68,9 @@ namespace RadioFreeZerg
                 NowPlaying = mediaPlayer.Media?.Meta(MetadataType.NowPlaying) ?? "";
         }
 
-        public void SetVolume(int percent) {
-            lock (locker) {
-                var clampedVolume = Math.Clamp(percent, 0, 100);
-                mediaPlayer.Volume = clampedVolume;
-            }
-        }
-
         public void Stop() {
             lock (locker) {
-                if (mediaPlayer.Media != null) {
-                    Log.Debug($"AudioPlayer stops playing '{mediaPlayer.Media.Mrl}'.");
-                }
+                if (mediaPlayer.Media != null) Log.Debug($"AudioPlayer stops playing '{mediaPlayer.Media.Mrl}'.");
 
                 mediaPlayer.Stop();
                 ClearMedia();
