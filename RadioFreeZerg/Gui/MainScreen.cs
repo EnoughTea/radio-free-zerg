@@ -16,17 +16,15 @@ namespace RadioFreeZerg.Gui
         private readonly ListView stationsListView;
         private readonly StatusBar statusBar;
 
-        private readonly Toplevel top;
-
         public MainScreen(RadioStationManager radioStationManager) {
             radioStations = radioStationManager;
             pagination = new RadioStationsPagination(radioStations.All);
             pagination.GoTo(Rng.Next(0, pagination.MaxPage + 1));
 
-            top = Application.Top;
-            mainWindow = CreateMainWindow("Radio stations:");
+            Toplevel top = Application.Top;
+            mainWindow = CreateMainWindow(RadioFreeZerg.MainScreen.MainScreenTitleText);
             top.Add(mainWindow);
-            
+
             stationsListView = CreateStationsListView();
             mainWindow.Add(stationsListView);
             GuiHelper.SetupScrollBars(stationsListView);
@@ -36,7 +34,7 @@ namespace RadioFreeZerg.Gui
 
             statusBar = CreateStatusBar();
             top.Add(statusBar);
-            
+
             stationsListView.OpenSelectedItem += args => {
                 radioStations.TogglePlay((RadioStation) args.Value);
                 RefreshNowPlaying();
@@ -81,23 +79,28 @@ namespace RadioFreeZerg.Gui
                 !string.IsNullOrWhiteSpace(radioStations.NowPlaying) &&
                 radioStations.NowPlaying.Trim().Length > 2;
             nowPlayingLabel.Text = hasNowPlaying
-                ? $"'{radioStations.NowPlaying}' at {stationTitle}"
+                ? string.Format(RadioFreeZerg.MainScreen.NowPlayingSongText, radioStations.NowPlaying, stationTitle)
                 : !string.IsNullOrEmpty(stationTitle)
-                    ? $"Unknown song at {stationTitle}"
-                    : "Nothing is playing";
+                    ? string.Format(RadioFreeZerg.MainScreen.NowPlayingUnknownText, stationTitle)
+                    : RadioFreeZerg.MainScreen.NowPlayingNothingText;
             mainWindow.SetNeedsDisplay();
         }
 
         public void RefreshStationList() {
-            PrevItem.Title = pagination.HasPrevious() ? "~^A~ Previous" : "No previous items";
-            NextItem.Title = pagination.HasNext() ? "~^S~ Next" : "No next";
+            PrevItem.Title = pagination.HasPrevious()
+                ? "~^S~ " + RadioFreeZerg.MainScreen.PrevItemsText
+                : RadioFreeZerg.MainScreen.NoPreviousItemsText;
+            NextItem.Title = pagination.HasNext()
+                ? "~^D~ " + RadioFreeZerg.MainScreen.NextItemsText
+                : RadioFreeZerg.MainScreen.NoNextItemsText;
             PagesItem.Title = $"{pagination.CurrentPage}/{pagination.MaxPage}";
             statusBar.SetNeedsDisplay();
             stationsListView.Source = new RadioStationListSource(pagination.CurrentPageStations);
         }
 
         public void PromptFindStations() {
-            var (input, canceled) = InputPrompt.Display("Enter title keywords or station ID", "Go");
+            var (input, canceled) = InputPrompt.Display(RadioFreeZerg.MainScreen.FindStationsPromptText,
+                RadioFreeZerg.MainScreen.FindStationsConfirmationText, RadioFreeZerg.MainScreen.FindStationsCancelText);
             if (!canceled) {
                 if (int.TryParse(input, NumberStyles.Integer, CultureInfo.InvariantCulture, out var id))
                     pagination.AllStations = new[] {radioStations.Find(id)};
@@ -127,7 +130,7 @@ namespace RadioFreeZerg.Gui
                 Height = 1,
                 CanFocus = false,
                 ColorScheme = nowPlayingColors,
-                Text = "Nothing is playing"
+                Text = RadioFreeZerg.MainScreen.NowPlayingNothingText
             };
         }
 
@@ -144,13 +147,15 @@ namespace RadioFreeZerg.Gui
         private StatusBar CreateStatusBar() =>
             new() {
                 Items = new StatusItem[] {
-                    new(Key.CtrlMask | Key.A, "", ListPreviousStations),
+                    new(Key.CtrlMask | Key.S, "", ListPreviousStations),
                     new(Key.CharMask, $"{pagination.CurrentPage}/{pagination.MaxPage}", null),
-                    new(Key.CtrlMask | Key.S, "", ListNextStations),
-                    new(Key.CtrlMask | Key.F, "~^F~ Find", PromptFindStations),
-                    new(Key.CtrlMask | Key.R, "~^R~ Random", PlayRandomStation),
-                    new(Key.CtrlMask | Key.T, "~^T~ Toggle", ToggleCurrentStation),
-                    new(Key.CtrlMask | Key.Q, "~^Q~ Quit", Application.RequestStop)
+                    new(Key.CtrlMask | Key.D, "", ListNextStations),
+                    new(Key.CtrlMask | Key.G, $"~^G~ {RadioFreeZerg.MainScreen.FindStationsText}", PromptFindStations),
+                    new(Key.CtrlMask | Key.R, $"~^R~ {RadioFreeZerg.MainScreen.PlayRandomStationText}",
+                        PlayRandomStation),
+                    new(Key.CtrlMask | Key.T, $"~^T~ {RadioFreeZerg.MainScreen.ToggleCurrentStationText}",
+                        ToggleCurrentStation),
+                    new(Key.CtrlMask | Key.Q, $"~^Q~ {RadioFreeZerg.MainScreen.QuitAppText}", Application.RequestStop)
                 }
             };
     }

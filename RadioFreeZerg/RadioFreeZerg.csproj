@@ -26,4 +26,19 @@
       </Content>
     </ItemGroup>
 
+    <ItemGroup>
+      <EmbeddedResource Update="MainScreen.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>MainScreen.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="MainScreen.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>MainScreen.resx</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
 </Project>
