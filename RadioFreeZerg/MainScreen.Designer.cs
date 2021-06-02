@@ -187,11 +187,29 @@ namespace RadioFreeZerg {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Toggle.
+        ///   Looks up a localized string similar to Favs.
+        /// </summary>
+        internal static string ShowFavsText {
+            get {
+                return ResourceManager.GetString("ShowFavsText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Toggle play.
         /// </summary>
         internal static string ToggleCurrentStationText {
             get {
                 return ResourceManager.GetString("ToggleCurrentStationText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Toggle fav.
+        /// </summary>
+        internal static string ToggleFavoriteText {
+            get {
+                return ResourceManager.GetString("ToggleFavoriteText", resourceCulture);
             }
         }
         

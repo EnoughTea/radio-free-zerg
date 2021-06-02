@@ -58,7 +58,7 @@
         <value>Random</value>
     </data>
     <data name="ToggleCurrentStationText" xml:space="preserve">
-        <value>Toggle</value>
+        <value>Toggle play</value>
     </data>
     <data name="QuitAppText" xml:space="preserve">
         <value>Quit</value>
@@ -68,5 +68,11 @@
     </data>
     <data name="VolumeDownText" xml:space="preserve">
         <value>-</value>
+    </data>
+    <data name="ToggleFavoriteText" xml:space="preserve">
+        <value>Toggle fav</value>
+    </data>
+    <data name="ShowFavsText" xml:space="preserve">
+        <value>Favs</value>
     </data>
 </root>

@@ -128,7 +128,7 @@ namespace RadioFreeZerg.Gui
                 : RadioFreeZerg.MainScreen.NoNextItemsText;
             PagesItem.Title = $"{pagination.CurrentPage + 1}/{pagination.MaxPage + 1}";
             statusBar.SetNeedsDisplay();
-            stationsListView.Source = new RadioStationListSource(pagination.CurrentPageStations);
+            stationsListView.Source = new RadioStationListSource(pagination.CurrentPageStations, state);
 
             state.CurrentPage = pagination.CurrentPage;
             state.AvailableStationsIds.Clear();

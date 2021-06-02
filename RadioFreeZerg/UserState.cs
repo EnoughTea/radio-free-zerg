@@ -33,6 +33,8 @@ namespace RadioFreeZerg
             }
         }
 
+        public FavsState Favs { get; set; } = new();
+
         public void Save() {
             Log.Trace("Serializing user state...");
             using var fileWriter = new StreamWriter(StateFilePath, false, Encoding.UTF8);
@@ -54,6 +56,20 @@ namespace RadioFreeZerg
                 throw new InvalidDataException($"Cannot deserialize {StateFilePath}");
             Log.Debug("User state deserialized.");
             return deserialized;
+        }
+
+        public class FavsState
+        {
+            public ISet<int> FavoriteStationsIds { get; set; } = new HashSet<int>(50000);
+
+            public int CurrentPage { get; set; }
+
+            public bool ShowingFavs { get; set; }
+
+            public void ToggleFavorite(int stationId) {
+                if (FavoriteStationsIds.Contains(stationId)) FavoriteStationsIds.Remove(stationId);
+                else FavoriteStationsIds.Add(stationId);
+            }
         }
     }
 }

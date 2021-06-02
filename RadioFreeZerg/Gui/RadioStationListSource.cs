@@ -14,10 +14,12 @@ namespace RadioFreeZerg.Gui
     /// <remarks>Implements support for rendering marked items.</remarks>
     public class RadioStationListSource : IListDataSource
     {
+        private readonly UserState state;
         private BitArray marks = null!;
         private IList<RadioStation> stations = null!;
 
-        public RadioStationListSource(IEnumerable<RadioStation> source) {
+        public RadioStationListSource(IEnumerable<RadioStation> source, UserState userState) {
+            state = userState;
             Init(source.ToList());
         }
 
@@ -42,11 +44,17 @@ namespace RadioFreeZerg.Gui
                            int width,
                            int start = 0) {
             container.Move(col, line);
-            object station = Stations[item];
-            if (station == null)
+            var station = Stations[item];
+            if (station != null) {
+                string stationRepr = station.ToString();
+                if (state.Favs.FavoriteStationsIds.Contains(station.Id)) {
+                    stationRepr = $"* {stationRepr}";
+                }
+                
+                RenderUstr(driver, stationRepr, col, line, width, start);
+            } else {
                 RenderUstr(driver, ustring.Make(""), col, line, width);
-            else
-                RenderUstr(driver, station.ToString(), col, line, width, start);
+            }
         }
 
         /// <inheritdoc />
@@ -69,7 +77,13 @@ namespace RadioFreeZerg.Gui
         }
 
         private int GetMaxLengthItem() =>
-            Stations.Select(station => station.ToString().Length)
+            Stations.Select(station => {
+                        const int favoriteMarkLength = 2;
+                        var stationLength = station.ToString().Length;
+                        return state.Favs.FavoriteStationsIds.Contains(station.Id)
+                            ? stationLength + favoriteMarkLength
+                            : stationLength;
+                    })
                     .Prepend(0)
                     .Max();
 
