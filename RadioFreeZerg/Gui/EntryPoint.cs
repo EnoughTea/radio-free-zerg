@@ -18,16 +18,21 @@ namespace RadioFreeZerg.Gui
             Log.Debug("LibVLC initialized.");
             Application.Init();
             Log.Debug("Terminal.Gui initialized.");
-            
+
             var radioStationsProvider = new CuteRadioStationProviderJson("stations.json");
             Log.Debug($"Created radio stations provider with {radioStationsProvider.All().Count} stations.");
             var radioStations = new RadioStationManager(radioStationsProvider);
             Log.Debug("Created radio stations manager.");
-            
+
             Log.Debug("Creating main screen...");
-            var userSettings = UserState.Load();
-            mainScreen = new MainScreen(radioStations, userSettings);
-            mainScreen.RefreshStationList();
+            var state = UserState.Load();
+            radioStations.Volume = state.Volume;
+            var previouslyToggledStation = radioStations.Find(state.ToggledStationId);
+            radioStations.ToggledStation = previouslyToggledStation;
+            var previouslyPlayedStation = radioStations.Find(state.CurrentStationId);
+            if (previouslyPlayedStation != RadioStation.Empty) radioStations.Play(previouslyPlayedStation);
+
+            mainScreen = new MainScreen(radioStations, state);
 
             Log.Debug("Running GUI...");
             Application.Run();
