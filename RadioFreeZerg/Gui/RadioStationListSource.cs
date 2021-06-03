@@ -14,6 +14,9 @@ namespace RadioFreeZerg.Gui
     /// <remarks>Implements support for rendering marked items.</remarks>
     public class RadioStationListSource : IListDataSource
     {
+        private const string PlayMark = "|> ";
+        private const string FavMark = "* ";
+
         private readonly UserState state;
         private BitArray marks = null!;
         private IList<RadioStation> stations = null!;
@@ -47,10 +50,10 @@ namespace RadioFreeZerg.Gui
             var station = Stations[item];
             if (station != null) {
                 string stationRepr = station.ToString();
-                if (state.Favs.FavoriteStationsIds.Contains(station.Id)) {
-                    stationRepr = $"* {stationRepr}";
-                }
-                
+                if (state.CurrentStationId == station.Id) stationRepr = $"{PlayMark}{stationRepr}";
+
+                if (state.Favs.FavoriteStationsIds.Contains(station.Id)) stationRepr = $"{FavMark}{stationRepr}";
+
                 RenderUstr(driver, stationRepr, col, line, width, start);
             } else {
                 RenderUstr(driver, ustring.Make(""), col, line, width);
@@ -78,11 +81,11 @@ namespace RadioFreeZerg.Gui
 
         private int GetMaxLengthItem() =>
             Stations.Select(station => {
-                        const int favoriteMarkLength = 2;
                         var stationLength = station.ToString().Length;
-                        return state.Favs.FavoriteStationsIds.Contains(station.Id)
-                            ? stationLength + favoriteMarkLength
+                        var lengthWithFav = state.Favs.FavoriteStationsIds.Contains(station.Id)
+                            ? stationLength + FavMark.Length
                             : stationLength;
+                        return state.CurrentStationId == station.Id ? lengthWithFav + PlayMark.Length : lengthWithFav;
                     })
                     .Prepend(0)
                     .Max();
