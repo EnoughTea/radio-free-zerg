@@ -27,10 +27,12 @@ namespace RadioFreeZerg.Gui
             if (!canceled) {
                 if (int.TryParse(input, NumberStyles.Integer, CultureInfo.InvariantCulture, out var id)) {
                     StationsList.SetStations(new[] {RadioStations.Find(id)});
+                    StationsList.SaveState(true);
                 } else {
                     var foundStations = RadioStations.Find(input).ToList();
                     Log.Info($"Found {foundStations.Count} stations.");
                     StationsList.SetStations(foundStations);
+                    StationsList.SaveState(true);
                 }
             } else {
                 Log.Debug("Canceled find stations prompt.");

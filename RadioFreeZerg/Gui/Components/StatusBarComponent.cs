@@ -46,6 +46,16 @@ namespace RadioFreeZerg.Gui
         public FindStationsComponent? FindStations { get; set; }
 
         public virtual void Refresh() {
+            if (StationsList != null) {
+                PrevItem.Title = StationsList.Pagination.HasPrevious()
+                    ? $"~^S~ {RadioFreeZerg.MainScreen.PrevItemsText}"
+                    : RadioFreeZerg.MainScreen.NoPreviousItemsText;
+                NextItem.Title = StationsList.Pagination.HasNext()
+                    ? $"~^D~ {RadioFreeZerg.MainScreen.NextItemsText}"
+                    : RadioFreeZerg.MainScreen.NoNextItemsText;
+                PagesItem.Title = $"{StationsList.Pagination.CurrentPage + 1}/{StationsList.Pagination.MaxPage + 1}";
+            }
+            
             statusBar.SetNeedsDisplay();
         }
     }

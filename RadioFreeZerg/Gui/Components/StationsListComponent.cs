@@ -10,17 +10,12 @@ namespace RadioFreeZerg.Gui
     {
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
-        private readonly Func<ISet<int>> backingStationIds;
-
         public StationsListComponent(RadioStationManager radioStationManager,
                                      UserState userState,
-                                     Window window,
-                                     Func<ISet<int>> getStateBackingStationIds)
+                                     Window window)
             : base(radioStationManager, userState, window) {
-            backingStationIds = getStateBackingStationIds;
-
             Pagination = new RadioStationsPagination();
-            StationsListView = new ListView() {
+            StationsListView = new ListView {
                 X = 1,
                 Y = 0,
                 Height = Dim.Fill(1),
@@ -37,19 +32,18 @@ namespace RadioFreeZerg.Gui
             };
         }
 
-        public ListView StationsListView { get; }
-
-        public RadioStationsPagination Pagination { get; }
-
         public NowPlayingComponent? NowPlaying { get; set; }
 
         public StatusBarComponent? StatusBar { get; set; }
 
-        public void SetStations(IReadOnlyCollection<RadioStation> stations) {
+        public ListView StationsListView { get; }
+
+        public RadioStationsPagination Pagination { get; }
+
+        public void SetStations(IReadOnlyCollection<RadioStation> stations, int page = 0) {
             Pagination.AllStations = stations;
-            Pagination.GoTo(0);
+            Pagination.GoTo(page);
             Refresh();
-            SaveState(true);
         }
 
         public void ListPreviousStations() {
@@ -81,27 +75,15 @@ namespace RadioFreeZerg.Gui
             Log.Trace($"Triggered station list refresh for {Pagination.CurrentPageStations} stations " +
                 $"at page {Pagination.CurrentPage + 1}.");
             StationsListView.Source = new RadioStationListSource(Pagination.CurrentPageStations, State);
-
-            if (StatusBar != null) {
-                StatusBar.PrevItem.Title = Pagination.HasPrevious()
-                    ? $"~^S~ {RadioFreeZerg.MainScreen.PrevItemsText}"
-                    : RadioFreeZerg.MainScreen.NoPreviousItemsText;
-                StatusBar.NextItem.Title = Pagination.HasNext()
-                    ? $"~^D~ {RadioFreeZerg.MainScreen.NextItemsText}"
-                    : RadioFreeZerg.MainScreen.NoNextItemsText;
-                StatusBar.PagesItem.Title = $"{Pagination.CurrentPage + 1}/{Pagination.MaxPage + 1}";
-                StatusBar.Refresh();
-            }
-
+            StatusBar?.Refresh();
             SaveState(false);
         }
 
-        private void SaveState(bool writeBackingStationIds) {
+        public void SaveState(bool writeBackingStationIds) {
             if (writeBackingStationIds) {
-                var stateStationIds = backingStationIds();
-                stateStationIds.Clear();
+                State.AvailableStationsIds.Clear();
                 foreach (var station in Pagination.AllStations) {
-                    stateStationIds.Add(station.Id);
+                    State.AvailableStationsIds.Add(station.Id);
                 }
             }
 
