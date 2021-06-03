@@ -11,15 +11,14 @@ namespace RadioFreeZerg.Gui
 
         public NowPlayingComponent(RadioStationManager radioStationManager,
                                    UserState userState,
-                                   Window window,
-                                   StationsListComponent stationsListComponent)
+                                   Window window)
             : base(radioStationManager, userState, window) {
             var nowPlayingColors = new ColorScheme {
                 Normal = new Attribute(Color.BrightYellow, window.ColorScheme.Normal.Background)
             };
             nowPlayingLabel = new Label {
                 X = 1,
-                Y = Pos.Bottom(stationsListComponent.StationsListView),
+                Y = Pos.Bottom(window) - 3,
                 Width = Dim.Fill(1),
                 Height = 1,
                 CanFocus = false,
@@ -50,6 +49,10 @@ namespace RadioFreeZerg.Gui
                     : RadioFreeZerg.MainScreen.NowPlayingNothingText;
             Window.SetNeedsDisplay();
 
+            SaveState();
+        }
+
+        private void SaveState() {
             State.ToggledStationId = RadioStations.ToggledStation.Id;
             State.CurrentStationId = RadioStations.CurrentStation.Id;
             State.Save();

@@ -16,13 +16,12 @@ namespace RadioFreeZerg.Gui
 
             Log.Debug("Creating components...");
             FindStations = new FindStationsComponent(radioStations, state, window);
-            StationsList = new StationsListComponent(radioStations, state, window,
-                () => state.AvailableStationsIds);
-            NowPlaying = new NowPlayingComponent(radioStations, state, window, StationsList);
+            StationsList = new StationsListComponent(radioStations, state, window);
+            NowPlaying = new NowPlayingComponent(radioStations, state, window);
             StatusBar = new StatusBarComponent(radioStations, state, window, top);
             Volume = new VolumeComponent(radioStations, state, window);
 
-            Log.Debug("Assigning component dependencies...");   // Eh, maybe use some container?
+            Log.Debug("Assigning component dependencies..."); // Eh, maybe use some container?
             StationsList.NowPlaying = NowPlaying;
             StationsList.StatusBar = StatusBar;
             StatusBar.Volume = Volume;
@@ -35,8 +34,9 @@ namespace RadioFreeZerg.Gui
             Log.Debug("Setting initial stations...");
             Volume.Refresh();
             StationsList.SetStations(state.AvailableStationsIds.Count == 0
-                ? radioStations.All
-                : radioStations.Where(_ => state.AvailableStationsIds.Contains(_.Id)).ToList());
+                    ? radioStations.All
+                    : radioStations.Where(_ => state.AvailableStationsIds.Contains(_.Id)).ToList(),
+                state.CurrentPage);
         }
 
         public FindStationsComponent FindStations { get; }
