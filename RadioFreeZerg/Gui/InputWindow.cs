@@ -13,6 +13,7 @@ namespace RadioFreeZerg.Gui
         private readonly TextField inputTextField;
         private readonly Label messageLabel;
         private readonly Button okButton;
+        private bool allowEmpty = true;
 
         public InputPrompt()
             : this(string.Empty, string.Empty, string.Empty, string.Empty) { }
@@ -35,12 +36,15 @@ namespace RadioFreeZerg.Gui
         /// <param name="cancelButtonText">Cancel button text.</param>
         /// <param name="inputLabelText">The text of the input field label.</param>
         /// <param name="message">The message.</param>
+        /// <param name="allowEmptyInput">if set to true, empty input is allowed; false otherwise.</param>
         public InputPrompt(ustring title,
                            ustring confirmationButtonText,
                            ustring cancelButtonText,
                            ustring inputLabelText,
-                           ustring message)
+                           ustring message,
+                           bool allowEmptyInput = true)
             : base(title) {
+            allowEmpty = allowEmptyInput;
             messageLabel = new Label(message) {X = 1, Y = 0};
             Add(messageLabel);
 
@@ -57,7 +61,7 @@ namespace RadioFreeZerg.Gui
                 Width = Dim.Fill() - 1
             };
             inputTextField.TextChanged += _ => {
-                if (okButton != null) okButton.CanFocus = !inputTextField.Text.IsEmpty;
+                if (okButton != null) okButton.CanFocus = allowEmpty || !inputTextField.Text.IsEmpty;
             };
             Add(inputLabel, inputTextField);
 
@@ -70,7 +74,7 @@ namespace RadioFreeZerg.Gui
 
             okButton = new Button(confirmationButtonText.IsEmpty ? DefaultConfirmationText : confirmationButtonText) {
                 IsDefault = true,
-                CanFocus = !inputTextField.Text.IsEmpty
+                CanFocus = allowEmpty || !inputTextField.Text.IsEmpty
             };
             okButton.Clicked += () => {
                 Canceled = false;
